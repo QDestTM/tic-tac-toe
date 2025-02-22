@@ -13,13 +13,14 @@ const BORDER_RADIUS_MAX = 20
 interface Props
 {
 	skey: string,
+	handlePress: boolean,
 	onSquarePress: SquarePressCallback,
 
 	children?: ReactNode
 }
 
 
-function Square({ skey, children, onSquarePress }: Props)
+function Square({ skey, handlePress, children, onSquarePress }: Props)
 {
 	const pressProgress: MutableRefObject<Animated.Value> = useRef(null);
 
@@ -89,12 +90,13 @@ function Square({ skey, children, onSquarePress }: Props)
 	var handlePressStart = () => {};
 	var handlePressEnd = () => {};
 
-	if ( children === null )
+	if ( children === null && handlePress )
 	{
 		handlePressStart = HandlePressIn
 		handlePressEnd = HandlePressOut
 	}
 
+	// Rendering JSX component
 	return (
 		<View style={style.main}>
 			<Animated.View
