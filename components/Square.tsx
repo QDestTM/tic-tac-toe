@@ -2,6 +2,7 @@ import { View, StyleSheet, Animated, Easing } from 'react-native'
 import React, { useState, useRef, useEffect } from 'react';
 
 import { SquarePressCallback } from '../models/BaseTypes'
+import { SquareKey } from '../models/BaseTypes'
 
 import { MutableRefObject } from 'react'
 import { ReactNode } from 'react'
@@ -12,13 +13,13 @@ const BORDER_RADIUS_MAX = 20
 
 interface Props
 {
-	squareKey: string,
+	skey: SquareKey,
 	children?: ReactNode,
 	onSquarePress: SquarePressCallback
 }
 
 
-function Square({ squareKey, children, onSquarePress }: Props)
+function Square({ skey, children, onSquarePress }: Props)
 {
 	const pressProgress: MutableRefObject<Animated.Value> = useRef(null);
 
@@ -79,7 +80,7 @@ function Square({ squareKey, children, onSquarePress }: Props)
 		)
 
 		animation.start()
-		onSquarePress(squareKey)
+		onSquarePress(skey)
 	}
 
 	// Rendering calculations
