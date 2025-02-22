@@ -2,7 +2,6 @@ import { View, StyleSheet, Animated, Easing } from 'react-native'
 import React, { useState, useRef, useEffect } from 'react';
 
 import { SquarePressCallback } from '../models/BaseTypes'
-import { SquareKey } from '../models/BaseTypes'
 
 import { MutableRefObject } from 'react'
 import { ReactNode } from 'react'
@@ -13,9 +12,10 @@ const BORDER_RADIUS_MAX = 20
 
 interface Props
 {
-	skey: SquareKey,
-	children?: ReactNode,
-	onSquarePress: SquarePressCallback
+	skey: string,
+	onSquarePress: SquarePressCallback,
+
+	children?: ReactNode
 }
 
 
