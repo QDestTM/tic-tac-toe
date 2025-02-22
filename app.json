@@ -1,7 +1,7 @@
 {
 	"expo": {
-		"name": "cpp-lab-1",
-		"slug": "cpp-lab-1",
+		"name": "TicTacToe",
+		"slug": "tic-tac-toe",
 		"version": "1.0.0",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",

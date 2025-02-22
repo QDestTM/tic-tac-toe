@@ -1,67 +1,67 @@
 {
 	"folder-color.pathColors": [
 		{
-			"folderPath": "cpp-lab-1\\.expo\\",
+			"folderPath": "tic-tac-toe\\.expo\\",
 			"color": "foldercolorizer.color_666699"
 		},
 		{
-			"folderPath": "cpp-lab-1\\.git\\",
+			"folderPath": "tic-tac-toe\\.git\\",
 			"color": "foldercolorizer.color_cc6666"
 		},
 		{
-			"folderPath": "cpp-lab-1\\.vscode\\",
+			"folderPath": "tic-tac-toe\\.vscode\\",
 			"color": "foldercolorizer.color_66ccff"
 		},
 		{
-			"folderPath": "cpp-lab-1\\assets\\",
+			"folderPath": "tic-tac-toe\\assets\\",
 			"color": "foldercolorizer.color_ff6666"
 		},
 		{
-			"folderPath": "cpp-lab-1\\components\\",
+			"folderPath": "tic-tac-toe\\components\\",
 			"color": "foldercolorizer.color_ffcc66"
 		},
 		{
-			"folderPath": "cpp-lab-1\\dist\\",
+			"folderPath": "tic-tac-toe\\dist\\",
 			"color": "foldercolorizer.color_339999"
 		},
 		{
-			"folderPath": "cpp-lab-1\\node_modules\\",
+			"folderPath": "tic-tac-toe\\node_modules\\",
 			"color": "foldercolorizer.color_00cc99"
 		},
 		{
-			"folderPath": "cpp-lab-1\\.gitignore\\",
+			"folderPath": "tic-tac-toe\\.gitignore\\",
 			"color": "foldercolorizer.color_9966cc"
 		},
 		{
-			"folderPath": "cpp-lab-1\\models\\",
+			"folderPath": "tic-tac-toe\\models\\",
 			"color": "foldercolorizer.color_336699"
 		},
 		{
-			"folderPath": "cpp-lab-1\\tsconfig.json\\",
+			"folderPath": "tic-tac-toe\\tsconfig.json\\",
 			"color": "foldercolorizer.color_669999"
 		},
 		{
-			"folderPath": "cpp-lab-1\\package.json\\",
+			"folderPath": "tic-tac-toe\\package.json\\",
 			"color": "foldercolorizer.color_339999"
 		},
 		{
-			"folderPath": "cpp-lab-1\\package-lock.json\\",
+			"folderPath": "tic-tac-toe\\package-lock.json\\",
 			"color": "foldercolorizer.color_339999"
 		},
 		{
-			"folderPath": "cpp-lab-1\\app.json\\",
+			"folderPath": "tic-tac-toe\\app.json\\",
 			"color": "foldercolorizer.color_666699"
 		},
 		{
-			"folderPath": "cpp-lab-1\\index.js\\",
+			"folderPath": "tic-tac-toe\\index.js\\",
 			"color": "foldercolorizer.color_669999"
 		},
 		{
-			"folderPath": "cpp-lab-1\\Shared.tsx\\",
+			"folderPath": "tic-tac-toe\\Shared.tsx\\",
 			"color": "foldercolorizer.color_6699cc"
 		},
 		{
-			"folderPath": "cpp-lab-1\\App.tsx\\",
+			"folderPath": "tic-tac-toe\\App.tsx\\",
 			"color": "foldercolorizer.color_6699cc"
 		}
 	]
