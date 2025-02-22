@@ -30,11 +30,39 @@
 		},
 		{
 			"folderPath": "cpp-lab-1\\.gitignore\\",
-			"color": "foldercolorizer.color_cccccc"
+			"color": "foldercolorizer.color_9966cc"
 		},
 		{
 			"folderPath": "cpp-lab-1\\models\\",
 			"color": "foldercolorizer.color_336699"
+		},
+		{
+			"folderPath": "cpp-lab-1\\tsconfig.json\\",
+			"color": "foldercolorizer.color_669999"
+		},
+		{
+			"folderPath": "cpp-lab-1\\package.json\\",
+			"color": "foldercolorizer.color_339999"
+		},
+		{
+			"folderPath": "cpp-lab-1\\package-lock.json\\",
+			"color": "foldercolorizer.color_339999"
+		},
+		{
+			"folderPath": "cpp-lab-1\\app.json\\",
+			"color": "foldercolorizer.color_666699"
+		},
+		{
+			"folderPath": "cpp-lab-1\\index.js\\",
+			"color": "foldercolorizer.color_669999"
+		},
+		{
+			"folderPath": "cpp-lab-1\\Shared.tsx\\",
+			"color": "foldercolorizer.color_6699cc"
+		},
+		{
+			"folderPath": "cpp-lab-1\\App.tsx\\",
+			"color": "foldercolorizer.color_6699cc"
 		}
 	]
 }
