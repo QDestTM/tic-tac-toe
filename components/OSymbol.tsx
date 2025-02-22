@@ -3,7 +3,7 @@ import React from "react";
 
 
 type Props = {
-	appearValue: number
+	appearValue?: number
 }
 
 
