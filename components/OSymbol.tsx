@@ -3,18 +3,21 @@ import React from "react";
 
 
 type Props = {
-	appearProgress: number
+	appearValue: number
 }
 
 
-function OSymbol({ appearProgress }: Props)
+function OSymbol({ appearValue = 1.0 }: Props)
 {
-	const mainStyle = {...style.main, transform : [{ scale : appearProgress }] }
+	const scale: number = appearValue
+
+	// Styles
+	const mainStyle = {...style.main, transform : [{scale}] }
 
 	// Rendering JSX component
 	return (
 		<Animated.View style={mainStyle}>
-			<View style={style.circle}/>
+			<View style={style.body}/>
 		</Animated.View>
 	)
 }
@@ -25,11 +28,11 @@ const style = StyleSheet.create({
 		alignItems : 'center',
 		justifyContent : 'center',
 
-		width : '70%',
-		height: '70%'
+		width : '100%',
+		height: '100%'
 	},
 
-	circle : {
+	body : {
 		position : 'absolute',
 		backgroundColor : 'transparent',
 
