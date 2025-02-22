@@ -3,22 +3,26 @@ import React from 'react'
 
 
 type Props = {
-	appearProgress: number
+	appearValue?: number
 }
 
 
-function XSymbol({ appearProgress }: Props)
+function XSymbol({ appearValue = 1.0 }: Props)
 {
-	const mainStyle = {...style.main, transform : [{ scaleX : appearProgress }] }
+	const scaleX: number = appearValue
+	const rotate: number = 45 * appearValue
 
-	const styleNor = { transform : [{ rotateZ : `+${45 * appearProgress}deg` }] }
-	const styleInv = { transform : [{ rotateZ : `-${45 * appearProgress}deg` }] }
+	// Styles
+	const mainStyle = {...style.main, transform : [{scaleX}] }
+
+	const box0 = { transform : [{ rotateZ : `+${rotate}deg` }] }
+	const box1 = { transform : [{ rotateZ : `-${rotate}deg` }] }
 
 	// Rendering JSX component
 	return (
 		<View style={mainStyle}>
-			<View style={[style.line, styleNor]}/>
-			<View style={[style.line, styleInv]}/>
+			<View style={[style.box, box0]}/>
+			<View style={[style.box, box1]}/>
 		</View>
 	)
 }
@@ -29,11 +33,11 @@ const style = StyleSheet.create({
 		alignItems : 'center',
 		justifyContent : 'center',
 
-		width : '70%',
-		height: '70%'
+		width : '100%',
+		height: '100%'
 	},
 
-	line : {
+	box : {
 		position : 'absolute',
 		backgroundColor : 'black',
 
