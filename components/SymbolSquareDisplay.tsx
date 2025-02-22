@@ -14,7 +14,7 @@ type Props = {
 }
 
 
-function SymbolContainer({ symbol }: Props)
+function SymbolSquareDisplay({ symbol }: Props)
 {
 	const appearValueRef: MutableRefObject<Animated.Value> = useRef(null)
 
@@ -78,4 +78,4 @@ const style = StyleSheet.create({
 })
 
 
-export default SymbolContainer;
+export default SymbolSquareDisplay;
