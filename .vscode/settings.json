@@ -1,0 +1,40 @@
+{
+	"folder-color.pathColors": [
+		{
+			"folderPath": "cpp-lab-1\\.expo\\",
+			"color": "foldercolorizer.color_666699"
+		},
+		{
+			"folderPath": "cpp-lab-1\\.git\\",
+			"color": "foldercolorizer.color_cc6666"
+		},
+		{
+			"folderPath": "cpp-lab-1\\.vscode\\",
+			"color": "foldercolorizer.color_66ccff"
+		},
+		{
+			"folderPath": "cpp-lab-1\\assets\\",
+			"color": "foldercolorizer.color_ff6666"
+		},
+		{
+			"folderPath": "cpp-lab-1\\components\\",
+			"color": "foldercolorizer.color_ffcc66"
+		},
+		{
+			"folderPath": "cpp-lab-1\\dist\\",
+			"color": "foldercolorizer.color_339999"
+		},
+		{
+			"folderPath": "cpp-lab-1\\node_modules\\",
+			"color": "foldercolorizer.color_00cc99"
+		},
+		{
+			"folderPath": "cpp-lab-1\\.gitignore\\",
+			"color": "foldercolorizer.color_cccccc"
+		},
+		{
+			"folderPath": "cpp-lab-1\\models\\",
+			"color": "foldercolorizer.color_336699"
+		}
+	]
+}
