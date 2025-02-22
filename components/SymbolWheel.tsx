@@ -7,68 +7,85 @@ import { MutableRefObject } from 'react'
 import XSymbol from './XSymbol'
 import OSymbol from './OSymbol'
 
+const ANGLE_STEP: number = 90
+const DX_EDGE: number = 6
 
-function SymbolWheel()
+type Props = {
+	turnIndex: number,
+	onSymbolSelect: (symbol: string) => void
+}
+
+
+type Members = {
+	rotation : number,
+
+	deltaX : number,
+	lastX : number
+}
+
+
+function SymbolWheel({ turnIndex, onSymbolSelect }: Props)
 {
 	const rotationValueRef: MutableRefObject<Animated.Value> = useRef(null)
-	const lastXRef: MutableRefObject<number> = useRef(null)
+	const dxValueRef: MutableRefObject<Animated.Value> = useRef(null)
+
+	const membersRef: MutableRefObject<Members> = useRef(null)
 
 	// Initializing refs
 	if ( rotationValueRef.current === null ) {
 		rotationValueRef.current = new Animated.Value(0)
 	}
 
-	if ( lastXRef.current === null ) {
-		lastXRef.current = 0
+	if ( dxValueRef.current === null ) {
+		dxValueRef.current = new Animated.Value(0)
+	}
+
+	if ( membersRef.current === null ) {
+		membersRef.current = { deltaX : 0, lastX : 0, rotation : 0 }
 	}
 
 	// States
 	const [ rotation, setRotation ] = useState(0)
 
+	// Updating ref state
+	membersRef.current.rotation = rotation
+
 	// Hooks
 	useEffect(() => {
-		const animation = rotationValueRef.current
-		const listener = animation.addListener(({value}) => {
+		const rtValue: Animated.Value = rotationValueRef.current
+		const dxValue: Animated.Value = dxValueRef.current
+
+		// Connecting listeners
+		const rtListener = rtValue.addListener(({value}) => {
 			setRotation(value)
 		})
 
+		const dxListener = dxValue.addListener(({value}) => {
+			const newRotation = ClampRotation(rotation + value)
+			setRotation(newRotation)
+		})
+
+		// Returning dismount callback
 		return () => {
-			animation.removeListener(listener)
+			rtValue.removeListener(rtListener)
+			dxValue.removeListener(dxListener)
 		}
 	})
 
-	// Handlers
-	function HandleTouchStart(event: GestureResponderEvent)
+	// Functions
+	function ClampRotation(rotation: number)
 	{
-		rotationValueRef.current.stopAnimation()
-
-		const move: NativeTouchEvent = event.nativeEvent
-		lastXRef.current = move.pageX
+		return ((rotation % 360) + 360) % 360
 	}
 
-	function HandleTouchMove(event: GestureResponderEvent)
+
+	function AnimateSnapRotation()
 	{
-		const move: NativeTouchEvent = event.nativeEvent
-		const lastX: number = lastXRef.current
+		const members: Members = membersRef.current
+		const rotation: number = members.rotation
 
-		// Applying rotation
-		let dx: number = (move.pageX - lastX) / 2
-		let rt: number = rotation + dx
-
-		if ( rt < -360 ) {
-			rt += 360
-		} else
-		if ( rt > 360 ) {
-			rt -= 720
-		}
-
-		lastXRef.current = move.pageX
-		setRotation(rt)
-	}
-
-	function HandleTouchEnd(event: GestureResponderEvent)
-	{
-		const toValue: number = Math.round(rotation / 90) * 90
+		// Find target rotation value
+		let toValue = Math.round(rotation / ANGLE_STEP) * ANGLE_STEP
 		rotationValueRef.current.setValue(rotation)
 
 		// Animating rotation to clothest angle
@@ -84,6 +101,74 @@ function SymbolWheel()
 		animation.start()
 	}
 
+	// Handlers
+	function HandleTouchStart(event: GestureResponderEvent)
+	{
+		const members: Members = membersRef.current
+
+		rotationValueRef.current.stopAnimation()
+		dxValueRef.current.stopAnimation()
+
+		const move: NativeTouchEvent = event.nativeEvent
+		members.lastX = move.pageX
+	}
+
+
+	function HandleTouchMove(event: GestureResponderEvent)
+	{
+		const members: Members = membersRef.current
+
+		const move: NativeTouchEvent = event.nativeEvent
+		const lastX: number = members.lastX
+
+		// Applying rotation
+		let dx: number = (move.pageX - lastX) / 2
+		let rt: number = ClampRotation(rotation + dx)
+
+		members.lastX = move.pageX
+		members.deltaX = dx
+
+		setRotation(rt)
+	}
+
+
+	function HandleTouchEnd(event: GestureResponderEvent)
+	{
+		const dx: number = membersRef.current.deltaX
+
+		// Just snap rotation of dx too small
+		if ( Math.abs(dx) < DX_EDGE ) {
+			return AnimateSnapRotation()
+		}
+
+		// Animating wheel rotation
+		dxValueRef.current.setValue(dx)
+
+		const animation = Animated.timing(
+			dxValueRef.current,
+			{
+				toValue : 0,
+				duration : 4000,
+				easing : Easing.out(Easing.quad),
+				useNativeDriver : false
+			}
+		)
+
+		animation.start(HandleRotationFinish)
+	}
+
+
+	function HandleRotationFinish({ finished }: Animated.EndResult)
+	{
+		if ( finished === true )
+		{
+			AnimateSnapRotation()
+		}
+	}
+
+	// Rendering calculations
+	const canRotate: boolean = turnIndex === 0
+
 	// Styles
 	const mainStyle = {...style.main,
 		transform : [{rotate: `${rotation}deg`}]
@@ -92,9 +177,9 @@ function SymbolWheel()
 	// Rendering JSX component
 	return (
 		<Animated.View style={mainStyle}
-			onTouchStart={HandleTouchStart}
-			onTouchMove={HandleTouchMove}
-			onTouchEnd={HandleTouchEnd}
+			onTouchStart={canRotate && HandleTouchStart}
+			onTouchMove={canRotate && HandleTouchMove}
+			onTouchEnd={canRotate && HandleTouchEnd}
 		>
 			<View style={style.circle}/> {/* Decorative circle in center */}
 
