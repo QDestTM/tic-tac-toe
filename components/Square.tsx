@@ -113,8 +113,8 @@ function Square({ skey, handlePress, children, onSquarePress }: Props)
 
 const style = StyleSheet.create({
 	main : {
-		width : 100,
-		height : 100
+		width : '33.33%',
+		height : '33.33%'
 	},
 
 	box : {
