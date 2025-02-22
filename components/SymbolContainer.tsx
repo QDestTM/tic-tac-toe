@@ -7,7 +7,7 @@ import React from 'react';
 import XSymbol from './XSymbol';
 import OSymbol from './OSymbol';
 
-import { X } from '../Constants'
+import { X } from '../Shared'
 
 
 type Props = {
