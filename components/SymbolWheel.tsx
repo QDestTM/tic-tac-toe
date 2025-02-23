@@ -4,27 +4,35 @@ import { StyleSheet, View, Easing, Animated } from 'react-native'
 import React, { useState, useRef, useEffect } from 'react'
 import { MutableRefObject } from 'react'
 
+import { X, O } from '../Shared'
+
 import XSymbol from './XSymbol'
 import OSymbol from './OSymbol'
 
 const ANGLE_STEP: number = 90
 const DX_EDGE: number = 6
 
+const SECTOR_COUNT: number = 360 / ANGLE_STEP
+
 type Props = {
 	turnIndex: number,
+
+	onSelectStart: () => void,
 	onSymbolSelect: (symbol: string) => void
 }
 
 
 type Members = {
+	sectorOffset : number,
 	rotation : number,
 
+	lastTurn : number,
 	deltaX : number,
 	lastX : number
 }
 
 
-function SymbolWheel({ turnIndex, onSymbolSelect }: Props)
+function SymbolWheel({ turnIndex, onSelectStart, onSymbolSelect }: Props)
 {
 	const rotationValueRef: MutableRefObject<Animated.Value> = useRef(null)
 	const dxValueRef: MutableRefObject<Animated.Value> = useRef(null)
@@ -40,8 +48,16 @@ function SymbolWheel({ turnIndex, onSymbolSelect }: Props)
 		dxValueRef.current = new Animated.Value(0)
 	}
 
-	if ( membersRef.current === null ) {
-		membersRef.current = { deltaX : 0, lastX : 0, rotation : 0 }
+	if ( membersRef.current === null )
+	{
+		membersRef.current = {
+			sectorOffset : 0,
+			rotation : 0,
+
+			lastTurn : 0,
+			deltaX : 0,
+			lastX  : 0,
+		}
 	}
 
 	// States
@@ -61,21 +77,54 @@ function SymbolWheel({ turnIndex, onSymbolSelect }: Props)
 		})
 
 		const dxListener = dxValue.addListener(({value}) => {
-			const newRotation = ClampRotation(rotation + value)
-			setRotation(newRotation)
+			setRotation(rotation + value)
 		})
+
+		// Rotating to section
+		const members: Members = membersRef.current
+
+		if ( members.lastTurn !== turnIndex )
+		{
+			AnimateSectionRotate(turnIndex)
+			members.lastTurn = turnIndex
+		}
 
 		// Returning dismount callback
 		return () => {
 			rtValue.removeListener(rtListener)
 			dxValue.removeListener(dxListener)
 		}
-	})
+	},
+		[turnIndex, rotation]
+	)
 
 	// Functions
 	function ClampRotation(rotation: number)
 	{
 		return ((rotation % 360) + 360) % 360
+	}
+
+
+	function AnimateSectionRotate(id: number)
+	{
+		rotationValueRef.current.stopAnimation()
+
+		const members: Members = membersRef.current
+		const offset: number = members.sectorOffset
+
+		// Calculating target rotation
+		var toValue: number = -(id + offset) * ANGLE_STEP
+
+		const animation = Animated.timing(
+			rotationValueRef.current,
+			{
+				toValue, duration : 1000,
+				easing : Easing.bounce,
+				useNativeDriver : false
+			}
+		)
+
+		animation.start()
 	}
 
 
@@ -98,7 +147,19 @@ function SymbolWheel({ turnIndex, onSymbolSelect }: Props)
 			}
 		)
 
-		animation.start()
+		animation.start(({ finished }) => {
+			if ( !finished ) return
+
+			// Calculating selected sector number
+			const sector: number = (toValue / ANGLE_STEP) % SECTOR_COUNT
+			const members: Members = membersRef.current
+
+			// Calculating offset and setting symbol
+			const offset: number = sector % 2
+
+			members.sectorOffset = offset
+			onSymbolSelect(offset ? O : X)
+		})
 	}
 
 	// Handlers
@@ -134,6 +195,7 @@ function SymbolWheel({ turnIndex, onSymbolSelect }: Props)
 
 	function HandleTouchEnd(event: GestureResponderEvent)
 	{
+		onSelectStart() // In any case leads to onSymbolSelect call
 		const dx: number = membersRef.current.deltaX
 
 		// Just snap rotation of dx too small
@@ -160,10 +222,12 @@ function SymbolWheel({ turnIndex, onSymbolSelect }: Props)
 
 	function HandleRotationFinish({ finished }: Animated.EndResult)
 	{
-		if ( finished === true )
-		{
-			AnimateSnapRotation()
-		}
+		const members: Members = membersRef.current
+		members.rotation = ClampRotation(members.rotation)
+
+		setRotation(-rotation) // Updating rotation state
+
+		if ( finished ) AnimateSnapRotation()
 	}
 
 	// Rendering calculations
@@ -184,18 +248,18 @@ function SymbolWheel({ turnIndex, onSymbolSelect }: Props)
 			<View style={style.circle}/> {/* Decorative circle in center */}
 
 			{/* Horizontal wheel container with a symbols display */}
-			<View key='wdispc-0' style={[style.container, style.containerH]}>
+			<View key='wdispc-evn' style={[style.container, style.containerH]}>
 				<View key='wdisp-0' style={[style.display, style.displayBeg]}>
 					<XSymbol/>
 				</View>
-				<View key='wdisp-1' style={[style.display, style.displayEnd]}>
+				<View key='wdisp-2' style={[style.display, style.displayEnd]}>
 					<XSymbol/>
 				</View>
 			</View>
 
 			{/* Vertical wheel container with a symbols display */}
-			<View key='wdispc-1' style={[style.container, style.containerV]}>
-				<View key='wdisp-2' style={[style.display, style.displayBeg]}>
+			<View key='wdispc-odd' style={[style.container, style.containerV]}>
+				<View key='wdisp-1' style={[style.display, style.displayBeg]}>
 					<OSymbol/>
 				</View>
 				<View key='wdisp-3' style={[style.display, style.displayEnd]}>
