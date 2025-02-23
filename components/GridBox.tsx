@@ -4,7 +4,7 @@ import React from 'react'
 import { SquarePressCallback } from '../models/BaseTypes'
 import { TurnState } from '../models/TurnTypes'
 
-import SymbolContainer from './SymbolContainer'
+import SymbolSquareDisplay from './SymbolSquareDisplay'
 import { D, N, sq, cn } from '../Shared'
 import Square from './Square'
 
@@ -44,7 +44,7 @@ function GridBox({ onSquarePress, turnState }: Props)
 				onSquarePress={onSquarePress}>
 			{
 				symbol !== D
-					? <SymbolContainer key={ckey} symbol={symbol}/>
+					? <SymbolSquareDisplay key={ckey} symbol={symbol}/>
 					: null
 			}
 			</Square>
@@ -70,8 +70,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'stretch',
 
-		marginLeft: '6%',
-		marginRight: '6%',
+		marginHorizontal : '6%',
 
 		borderColor: 'teal',
 		borderWidth: 10,
