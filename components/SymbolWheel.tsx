@@ -24,7 +24,6 @@ type Members = {
 	offset : number,
 	rotation : number,
 
-	lastTurn : number,
 	deltaX : number,
 	lastX : number
 }
@@ -52,7 +51,6 @@ function SymbolWheel({ turnIndex, onSpinerStart, onOffsetChanged }: Props)
 			rotation : 0,
 			offset : 0,
 
-			lastTurn : 0,
 			deltaX : 0,
 			lastX  : 0,
 		}
@@ -78,22 +76,19 @@ function SymbolWheel({ turnIndex, onSpinerStart, onOffsetChanged }: Props)
 			setRotation(rotation + value)
 		})
 
-		// Rotating to section
-		const members: Members = membersRef.current
-
-		if ( members.lastTurn !== turnIndex )
-		{
-			AnimateSectionRotate(turnIndex)
-			members.lastTurn = turnIndex
-		}
-
 		// Returning dismount callback
 		return () => {
 			rtValue.removeListener(rtListener)
 			dxValue.removeListener(dxListener)
 		}
 	},
-		[turnIndex, rotation]
+		[rotation]
+	)
+
+	useEffect(() => {
+		AnimateSectionRotate(turnIndex)
+	},
+		[turnIndex]
 	)
 
 	// Functions
