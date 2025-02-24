@@ -4,26 +4,24 @@ import { StyleSheet, View, Easing, Animated } from 'react-native'
 import React, { useState, useRef, useEffect } from 'react'
 import { MutableRefObject } from 'react'
 
-import { X, O } from '../Shared'
-
 import XSymbol from './XSymbol'
 import OSymbol from './OSymbol'
 
 const ANGLE_STEP: number = 90
-const DX_EDGE: number = 6
+const DX_TRACEHOLD: number = 6
 
 const SECTOR_COUNT: number = 360 / ANGLE_STEP
 
 type Props = {
 	turnIndex: number,
 
-	onSelectStart: () => void,
-	onSymbolSelect: (symbol: string) => void
+	onSpinerStart: () => void,
+	onOffsetChanged: (offset: number) => void
 }
 
 
 type Members = {
-	sectorOffset : number,
+	offset : number,
 	rotation : number,
 
 	lastTurn : number,
@@ -32,7 +30,7 @@ type Members = {
 }
 
 
-function SymbolWheel({ turnIndex, onSelectStart, onSymbolSelect }: Props)
+function SymbolWheel({ turnIndex, onSpinerStart, onOffsetChanged }: Props)
 {
 	const rotationValueRef: MutableRefObject<Animated.Value> = useRef(null)
 	const dxValueRef: MutableRefObject<Animated.Value> = useRef(null)
@@ -51,8 +49,8 @@ function SymbolWheel({ turnIndex, onSelectStart, onSymbolSelect }: Props)
 	if ( membersRef.current === null )
 	{
 		membersRef.current = {
-			sectorOffset : 0,
 			rotation : 0,
+			offset : 0,
 
 			lastTurn : 0,
 			deltaX : 0,
@@ -110,7 +108,7 @@ function SymbolWheel({ turnIndex, onSelectStart, onSymbolSelect }: Props)
 		rotationValueRef.current.stopAnimation()
 
 		const members: Members = membersRef.current
-		const offset: number = members.sectorOffset
+		const offset: number = members.offset
 
 		// Calculating target rotation
 		var toValue: number = -(id + offset) * ANGLE_STEP
@@ -157,8 +155,8 @@ function SymbolWheel({ turnIndex, onSelectStart, onSymbolSelect }: Props)
 			// Calculating offset and setting symbol
 			const offset: number = sector % 2
 
-			members.sectorOffset = offset
-			onSymbolSelect(offset ? O : X)
+			members.offset = offset
+			onOffsetChanged(offset)
 		})
 	}
 
@@ -195,11 +193,11 @@ function SymbolWheel({ turnIndex, onSelectStart, onSymbolSelect }: Props)
 
 	function HandleTouchEnd(event: GestureResponderEvent)
 	{
-		onSelectStart() // In any case leads to onSymbolSelect call
+		onSpinerStart() // In any case leads to onSymbolSelect call
 		const dx: number = membersRef.current.deltaX
 
 		// Just snap rotation of dx too small
-		if ( Math.abs(dx) < DX_EDGE ) {
+		if ( Math.abs(dx) < DX_TRACEHOLD ) {
 			return AnimateSnapRotation()
 		}
 
