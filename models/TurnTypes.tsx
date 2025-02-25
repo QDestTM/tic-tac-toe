@@ -1,7 +1,8 @@
-
+// Full state of the turn
 export type TurnState = {
-	[key: string] : string
+	pattern : string[],
 	winner : string
 }
 
+// Array with all states
 export type TurnsData = TurnState[]
