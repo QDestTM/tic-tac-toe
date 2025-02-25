@@ -1,111 +1,136 @@
 import { View, StyleSheet, Animated, Easing } from 'react-native'
-import React, { useState, useRef, useEffect } from 'react';
 
-import { SquarePressCallback } from '../models/BaseTypes'
+import { ReactNode, MutableRefObject } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
-import { MutableRefObject } from 'react'
-import { ReactNode } from 'react'
+import { COLOR_SECONDARY_0 } from '../Shared';
+import { COLOR_SECONDARY_1 } from '../Shared';
+import { COLOR_SECONDARY_2 } from '../Shared';
+import { COLOR_SECONDARY_3 } from '../Shared';
+import { lerp, N } from '../Shared';
 
-const BORDER_RADIUS_MIN = 10
-const BORDER_RADIUS_MAX = 20
+import TransitionButton from './TransitionButton';
+import ColorInterpolate from 'color-interpolate'
+import { SquareState } from '../models/BaseTypes';
+
+const BORDER_RADIUS_N = 15 // N - Normal state
+const BORDER_RADIUS_P = 35 // P - Pressed state
+
+const BCG_COLORMAP = ColorInterpolate([COLOR_SECONDARY_0, COLOR_SECONDARY_1])
+const WIN_COLORMAP = ColorInterpolate([COLOR_SECONDARY_0, COLOR_SECONDARY_3])
 
 
 interface Props
 {
 	skey: string,
-	handlePress: boolean,
-	onSquarePress: SquarePressCallback,
+	children?: ReactNode,
+	state : SquareState
 
-	children?: ReactNode
+	onTouchInput: (skey: string) => void,
 }
 
 
-function Square({ skey, handlePress, children, onSquarePress }: Props)
+function Square({ skey, children, state, onTouchInput }: Props)
 {
-	const pressProgress: MutableRefObject<Animated.Value> = useRef(null);
+	const winnerValueRef: MutableRefObject<Animated.Value> = useRef(null)
 
-	// Initializing refs
-	if ( pressProgress.current === null ) {
-		pressProgress.current = new Animated.Value(0)
+	// Initializing refs-
+	if ( winnerValueRef.current === null ) {
+		winnerValueRef.current = new Animated.Value(0)
 	}
 
 	// States
-	const [ backgroundColor, setBackgroundColor ] = useState('linen')
-	const [ borderRadius, setBorderRadius ] = useState(BORDER_RADIUS_MIN)
+	const [ backgroundColor, setBackgroundColor ] = useState(COLOR_SECONDARY_0)
+	const [ borderRadius, setBorderRadius ] = useState(BORDER_RADIUS_N)
 
 	// Hooks
 	useEffect(() => {
-		const animation: Animated.Value = pressProgress.current
+		const winnerValue: Animated.Value = winnerValueRef.current
 
-		const animationListener = animation.addListener(() => {
-			const inputRange: number[] = [0, 1]
+		const winnerListener = winnerValue.addListener(({ value }) => {
+			// Updating background color state
+			const color: string = WIN_COLORMAP(value)
+			setBackgroundColor(color)
 
-			// Background color
-			let color = animation.interpolate<string>({
-				inputRange, outputRange : ['linen', 'wheat']
-			})
-
-			setBackgroundColor(color as unknown as string)
-
-			// Border radius
-			let radius = animation.interpolate<number>({
-				inputRange, outputRange : [BORDER_RADIUS_MIN, BORDER_RADIUS_MAX]
-			})
-
-			setBorderRadius(radius as unknown as number)
+			// Updating border radius state
+			const radius: number = BORDER_RADIUS_N + (100 - BORDER_RADIUS_N) * value
+			setBorderRadius(radius)
 		})
 
+		// Returning dismount callback
 		return () => {
-			animation.removeListener(animationListener)
+			winnerValue.removeListener(winnerListener)
 		}
-	},
-		[pressProgress]
-	)
+	})
 
-	// Handlers
-	function HandlePressIn()
-	{
-		pressProgress.current.setValue(1)
-	}
 
-	function HandlePressOut()
-	{
+	useEffect(() => {
+		const inPattern: boolean = state.pattern.includes(skey)
+		let easing = Easing.out(Easing.quad) // OUT
+
+		let toValue: number = 0;
+		let delay  : number = 0
+
+		if ( state.winner !== N && inPattern ) // IN
+		{
+			toValue = 1; delay = 1000
+			easing = Easing.bounce
+		}
+
+		// Starting animation
 		const animation = Animated.timing(
-			pressProgress.current,
+			winnerValueRef.current,
 			{
-				toValue : 0,
+				toValue, delay, easing,
 				duration : 1000,
-				easing : Easing.bounce,
 				useNativeDriver : false
 			}
 		)
 
 		animation.start()
-		onSquarePress(skey)
+	},
+		[state.winner]
+	)
+
+	// Handlers
+	function HandleTouchAnimation(value: number)
+	{
+		// Updating background color state
+		const color: string = BCG_COLORMAP(value)
+		setBackgroundColor(color)
+
+		// Updating border radius state
+		const radius: number = lerp(BORDER_RADIUS_N, BORDER_RADIUS_P, value)
+		setBorderRadius(radius)
+	}
+
+
+	function HandleTouchInput()
+	{
+		onTouchInput(skey)
 	}
 
 	// Rendering calculations
-	const squareStyle = {...style.box, borderRadius, backgroundColor}
-
-	var handlePressStart = () => {};
-	var handlePressEnd = () => {};
-
-	if ( children === null && handlePress )
-	{
-		handlePressStart = HandlePressIn
-		handlePressEnd = HandlePressOut
+	const ignoreTouch = children !== null || state.winner !== N
+	const boxStyle = {...style.box, backgroundColor,
+		borderRadius : `${borderRadius}%`
 	}
 
 	// Rendering JSX component
 	return (
 		<View style={style.main}>
-			<Animated.View
-				onTouchStart={handlePressStart}
-				onTouchEnd={handlePressEnd}
-				style={squareStyle}
+			<TransitionButton
+				touchDuration={1000}
+				touchEasing={Easing.bounce}
+				ignoreTouch={ignoreTouch}
+
+				onTouchAnimation={HandleTouchAnimation}
+				onTouchInput={HandleTouchInput}
 			>
-				{children}
-			</Animated.View>
+				<Animated.View style={boxStyle}>
+					{children}
+				</Animated.View>
+			</TransitionButton>
 		</View>
 	)
 }
@@ -118,16 +143,16 @@ const style = StyleSheet.create({
 	},
 
 	box : {
+		flex : 1,
+		margin : '3%',
+
 		alignItems : 'center',
 		justifyContent : 'center',
 
-		borderRadius : 5,
 		borderWidth : 6,
 		borderStyle : 'solid',
-		borderColor : 'burlywood',
 
-		margin : 5,
-		flex : 1
+		borderColor : COLOR_SECONDARY_2,
 	}
 })
 
