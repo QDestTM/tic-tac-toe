@@ -63,6 +63,10 @@
 		{
 			"folderPath": "tic-tac-toe\\App.tsx\\",
 			"color": "foldercolorizer.color_6699cc"
+		},
+		{
+			"folderPath": "tic-tac-toe\\styles\\",
+			"color": "foldercolorizer.color_cc9966"
 		}
 	]
 }
