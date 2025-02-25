@@ -1,25 +1,24 @@
 import { View, StyleSheet } from 'react-native'
 import React from 'react'
 
-import { SquarePressCallback } from '../models/BaseTypes'
+import { SquareState } from '../models/BaseTypes'
 import { TurnState } from '../models/TurnTypes'
 
-import SymbolSquareDisplay from './SymbolSquareDisplay'
-import { D, N, sq, cn } from '../Shared'
+import { sq } from '../Shared'
 import Square from './Square'
 
 
 
 interface Props
 {
-	onSquarePress: SquarePressCallback,
-	turnState : TurnState
+	turnState : TurnState,
+
+	onSquarePress: (skey: string) => void
 }
 
 
 function GridBox({ onSquarePress, turnState }: Props)
 {
-	const handlePress: boolean = turnState.winner === N
 	const range: number[] = [0, 1, 2]
 
 	// Functions
@@ -32,22 +31,20 @@ function GridBox({ onSquarePress, turnState }: Props)
 
 	function SquareRender(row: number, index: number)
 	{
-		let skey: string = sq(row + index)
-		let ckey: string = cn(row + index)
+		const skey: string = sq(row + index)
 
-		let symbol: string = turnState[skey]
+		const state: SquareState = {
+			pattern : turnState.pattern,
+
+			winner : turnState.winner,
+			symbol : turnState[skey]
+		}
 
 		return (
 			<Square
-				key={skey} skey={skey}
-				handlePress={handlePress}
-				onSquarePress={onSquarePress}>
-			{
-				symbol !== D
-					? <SymbolSquareDisplay key={ckey} symbol={symbol}/>
-					: null
-			}
-			</Square>
+				key={skey} skey={skey} state={state}
+				onTouchInput={onSquarePress}
+			/>
 		)
 	}
 
@@ -65,6 +62,8 @@ const styles = StyleSheet.create({
 		backgroundColor : 'lightseagreen',
 
 		aspectRatio : 1,
+
+		flexDirection : 'row',
 		flexWrap : 'wrap',
 
 		justifyContent: 'center',
