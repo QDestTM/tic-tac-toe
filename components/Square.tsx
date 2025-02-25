@@ -1,17 +1,18 @@
 import { View, StyleSheet, Animated, Easing } from 'react-native'
 
-import { ReactNode, MutableRefObject } from 'react';
 import { useState, useEffect, useRef } from 'react';
+import { MutableRefObject } from 'react';
 
 import { COLOR_SECONDARY_0 } from '../Shared';
 import { COLOR_SECONDARY_1 } from '../Shared';
 import { COLOR_SECONDARY_2 } from '../Shared';
 import { COLOR_SECONDARY_3 } from '../Shared';
-import { lerp, N } from '../Shared';
+import { lerp, N, D } from '../Shared';
 
 import TransitionButton from './TransitionButton';
 import ColorInterpolate from 'color-interpolate'
 import { SquareState } from '../models/BaseTypes';
+import SymbolDisplay from './SymbolDisplay';
 
 const BORDER_RADIUS_N = 15 // N - Normal state
 const BORDER_RADIUS_P = 35 // P - Pressed state
@@ -23,14 +24,13 @@ const WIN_COLORMAP = ColorInterpolate([COLOR_SECONDARY_0, COLOR_SECONDARY_3])
 interface Props
 {
 	skey: string,
-	children?: ReactNode,
 	state : SquareState
 
 	onTouchInput: (skey: string) => void,
 }
 
 
-function Square({ skey, children, state, onTouchInput }: Props)
+function Square({ skey, state, onTouchInput }: Props)
 {
 	const winnerValueRef: MutableRefObject<Animated.Value> = useRef(null)
 
@@ -111,7 +111,7 @@ function Square({ skey, children, state, onTouchInput }: Props)
 	}
 
 	// Rendering calculations
-	const ignoreTouch = children !== null || state.winner !== N
+	const ignoreTouch = state.symbol !== D || state.winner !== N
 	const boxStyle = {...style.box, backgroundColor,
 		borderRadius : `${borderRadius}%`
 	}
@@ -128,7 +128,7 @@ function Square({ skey, children, state, onTouchInput }: Props)
 				onTouchInput={HandleTouchInput}
 			>
 				<Animated.View style={boxStyle}>
-					{children}
+					<SymbolDisplay symbol={state.symbol}/>
 				</Animated.View>
 			</TransitionButton>
 		</View>
