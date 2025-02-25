@@ -6,7 +6,7 @@ import React, { MutableRefObject } from 'react';
 import XSymbol from './XSymbol';
 import OSymbol from './OSymbol';
 
-import { X } from '../Shared'
+import { D, X } from '../Shared'
 
 
 type Props = {
@@ -14,7 +14,7 @@ type Props = {
 }
 
 
-function SymbolSquareDisplay({ symbol }: Props)
+function SymbolDisplay({ symbol }: Props)
 {
 	const appearValueRef: MutableRefObject<Animated.Value> = useRef(null)
 
@@ -24,6 +24,7 @@ function SymbolSquareDisplay({ symbol }: Props)
 	}
 
 	// States
+	const [ renderSymbol, setRenderSymbol ] = useState(D)
 	const [ appear, setAppear ] = useState(0)
 
 	// Hooks
@@ -34,31 +35,42 @@ function SymbolSquareDisplay({ symbol }: Props)
 			setAppear(value)
 		})
 
-		// Starting appear animation
+		// Return dismount callback
+		return () => {
+			appearValue.removeListener(listener)
+		}
+	})
+
+
+	useEffect(() => {
+		let easing = Easing.bounce
+		let toValue: number = 1
+
+		if ( symbol !== D ) {
+			setRenderSymbol(symbol)
+		} else { // Dissapear
+			easing = Easing.out(Easing.quad)
+			toValue = 0
+		}
+
 		const animation = Animated.timing(
-			appearValue,
+			appearValueRef.current,
 			{
-				toValue : 1,
+				toValue, easing,
 				duration : 1000,
-				easing : Easing.bounce,
 				useNativeDriver : false
 			}
 		)
 
 		animation.start()
-
-		// Return dismount callback
-		return () => {
-			appearValue.removeListener(listener)
-		}
 	},
-		[appearValueRef]
+		[symbol]
 	)
 
 	// Rendering JSX component
 	return (
 		<View style={style.main}>
-			{ symbol == X ?
+			{ renderSymbol == X ?
 				<XSymbol appearValue={appear}/> :
 				<OSymbol appearValue={appear}/>
 			}
@@ -78,4 +90,4 @@ const style = StyleSheet.create({
 })
 
 
-export default SymbolSquareDisplay;
+export default SymbolDisplay;
