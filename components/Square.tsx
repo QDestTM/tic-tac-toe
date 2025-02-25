@@ -65,6 +65,8 @@ function Square({ skey, state, onTouchInput }: Props)
 
 
 	useEffect(() => {
+		if ( state.winner === D ) return
+
 		const inPattern: boolean = state.pattern.includes(skey)
 		let easing = Easing.out(Easing.quad) // OUT
 
@@ -112,6 +114,7 @@ function Square({ skey, state, onTouchInput }: Props)
 
 	// Rendering calculations
 	const ignoreTouch = state.symbol !== D || state.winner !== N
+	console.log(state.winner)
 	const boxStyle = {...style.box, backgroundColor,
 		borderRadius : `${borderRadius}%`
 	}
@@ -128,7 +131,10 @@ function Square({ skey, state, onTouchInput }: Props)
 				onTouchInput={HandleTouchInput}
 			>
 				<Animated.View style={boxStyle}>
-					<SymbolDisplay symbol={state.symbol}/>
+					<SymbolDisplay
+						key={`sdisp-${skey}`}
+						symbol={state.symbol}
+					/>
 				</Animated.View>
 			</TransitionButton>
 		</View>
