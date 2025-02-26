@@ -3,18 +3,21 @@ import { Animated, Easing, StyleSheet, View } from 'react-native';
 import { useRef, useState, useEffect } from 'react';
 import React, { MutableRefObject } from 'react';
 
-import XSymbol from './XSymbol';
-import OSymbol from './OSymbol';
+import { D, N, O, X } from '../Shared'
 
-import { D, X } from '../Shared'
+import XSymbol from './symbols/XSymbol';
+import OSymbol from './symbols/OSymbol';
+import DSymbol from './symbols/DSymbol';
+import NSymbol from './symbols/NSymbol';
 
 
 type Props = {
-	symbol: string
+	hiddenSymbols?: string[],
+	symbol?: string
 }
 
 
-function SymbolDisplay({ symbol }: Props)
+function SymbolDisplay({ symbol = N, hiddenSymbols = [] }: Props)
 {
 	const appearValueRef: MutableRefObject<Animated.Value> = useRef(null)
 
@@ -24,7 +27,7 @@ function SymbolDisplay({ symbol }: Props)
 	}
 
 	// States
-	const [ renderSymbol, setRenderSymbol ] = useState(D)
+	const [ displaySymbol, setDisplaySymbol ] = useState(D)
 	const [ appear, setAppear ] = useState(0)
 
 	// Hooks
@@ -43,37 +46,62 @@ function SymbolDisplay({ symbol }: Props)
 
 
 	useEffect(() => {
-		let easing = Easing.bounce
-		let toValue: number = 1
+		var animation: Animated.CompositeAnimation
 
-		if ( symbol !== D ) {
-			setRenderSymbol(symbol)
-		} else { // Dissapear
-			easing = Easing.out(Easing.quad)
-			toValue = 0
+		if ( hiddenSymbols.includes(symbol) ) // Hide animation
+		{
+			animation = Animated.timing(
+				appearValueRef.current,
+				{
+					toValue : 0,
+					duration : 1000,
+					easing : Easing.out(Easing.quad),
+					useNativeDriver : false
+				}
+			)
 		}
+		else // Show animation
+		{
+			animation = Animated.timing(
+				appearValueRef.current,
+				{
+					toValue : 1,
+					easing : Easing.bounce,
+					duration : 1000,
+					useNativeDriver : false
+				}
+			)
 
-		const animation = Animated.timing(
-			appearValueRef.current,
-			{
-				toValue, easing,
-				duration : 1000,
-				useNativeDriver : false
-			}
-		)
+			setDisplaySymbol(symbol)
+		}
 
 		animation.start()
 	},
 		[symbol]
 	)
 
+	// Functions
+	function GetSymbolComponent()
+	{
+		switch (displaySymbol)
+		{
+			case X:
+				return <XSymbol appearValue={appear}/>
+			case O:
+				return <OSymbol appearValue={appear}/>
+			case D:
+				return <DSymbol appearValue={appear}/>
+			case N:
+				return <NSymbol appearValue={appear}/>
+			default:
+				return <></>
+		}
+	}
+
 	// Rendering JSX component
 	return (
 		<View style={style.main}>
-			{ renderSymbol == X ?
-				<XSymbol appearValue={appear}/> :
-				<OSymbol appearValue={appear}/>
-			}
+			{ GetSymbolComponent() }
 		</View>
 	)
 }
