@@ -1,8 +1,13 @@
 // Full state of the turn
 export type TurnState = {
-	pattern : string[],
-	winner : string
+	// sq-{i} : string,
+	pattern   : string[],
+	winner    : string
 }
 
-// Array with all states
-export type TurnsData = TurnState[]
+// State of the whole match
+export type MatchState = {
+	turns : TurnState[] // Array with all turns
+	index : number, // Index of current turn
+	count : number // Count of turns
+}

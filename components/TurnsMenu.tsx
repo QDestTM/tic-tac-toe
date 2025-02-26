@@ -1,6 +1,6 @@
 import { ScrollView, StyleSheet, View } from "react-native"
 
-import { TurnsData, TurnState } from "../models/TurnTypes"
+import { MatchState, TurnState } from "../models/TurnTypes"
 import { StateRange } from "../Shared"
 
 import TurnStateDisplay from "./TurnStateDisplay"
@@ -8,14 +8,12 @@ import { MutableRefObject, useEffect, useRef } from "react"
 
 
 type Props = {
-	turnsData: TurnsData,
-	turnIndex: number,
-
+	matchState: MatchState,
 	onTurnSelect: (index: number) => void
 }
 
 
-function TurnsMenu({ turnsData, turnIndex, onTurnSelect }: Props)
+function TurnsMenu({ matchState, onTurnSelect }: Props)
 {
 	const scrollViewRef: MutableRefObject<ScrollView> = useRef(null)
 
@@ -23,19 +21,19 @@ function TurnsMenu({ turnsData, turnIndex, onTurnSelect }: Props)
 	useEffect(() => {
 		scrollViewRef.current.scrollTo({ x : 0, animated : true })
 	},
-		[turnsData.length]
+		[matchState.count]
 	)
 
 	// Functions
 	function RenderDisplay(index: number)
 	{
-		const state: TurnState | undefined = turnsData[index]
+		const state: TurnState | undefined = matchState.turns[index]
 
 		return (
 			<View>
 				<TurnStateDisplay key={`state-disp-${index}`}
 					turnState={state} turnIndex={index}
-					selected={index === turnIndex}
+					selected={index === matchState.index}
 					onTurnSelect={onTurnSelect}
 				/>
 			</View>

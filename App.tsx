@@ -1,8 +1,10 @@
 import { GestureResponderEvent, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
-import { MutableRefObject, StrictMode, useRef, useState } from 'react';
-import { TurnsData, TurnState } from './models/TurnTypes';
+import { MutableRefObject, StrictMode } from 'react';
+import { useRef, useState } from 'react';
+
+import { MatchState, TurnState } from './models/TurnTypes';
 
 import { WinningPatterns, MinTurn, MaxTurn } from './Shared'
 import { D, N, sym, sq } from './Shared'
@@ -14,18 +16,27 @@ import GridBox from './components/GridBox';
 
 
 // Functions
-function GenerateTurnsData(): TurnsData
+function GenerateState(): MatchState
 {
-	const state: TurnState = {
-		pattern : [], winner : N
+	const state: MatchState = {
+		turns : [{
+			pattern : [],
+			winner  : N
+		}],
+
+		index : 0,
+		count : 0
 	}
 
 	// Grid generation
-	for ( let i = 0; i < 9; i++ ) {
-		state[sq(i)] = D
+	const turn: TurnState = state.turns[0]
+
+	for ( let i = 0; i <= MaxTurn; i++ )
+	{
+		turn[sq(i)] = D
 	}
 
-	return [state]
+	return state
 }
 
 
@@ -71,9 +82,7 @@ function App()
 
 	// States
 	var [ blockingInput, setBlockingInput ] = useState(false)
-
-	var [ turnsData, setTurnsData ] = useState(GenerateTurnsData)
-	var [ turnIndex, setTurnIndex ] = useState(0)
+	var [ matchState, setMatchState ] = useState(GenerateState)
 
 	// Functions
 	function GetInputBlocker()
@@ -96,24 +105,35 @@ function App()
 	// Handlers
 	function HandleSquarePress(key: string)
 	{
-		// Incrementing turn index
-		const nextIndex: number = turnIndex + 1
-		setTurnIndex(nextIndex)
+		const state: MatchState = matchState
 
-		// Updating turns data state
+		// Incrementing turn index
+		const indexCurr: number = state.index
+		const indexNext: number = state.index + 1
+
+		// Updating turn state
 		const offset: number = symbolOffsetRef.current
 		const symbol: string = sym(turnIndex + offset)
 
-		const lastState: TurnState = turnsData[turnIndex]
-		const nextState: TurnState = {...lastState, [key] : symbol}
-
-		setTurnsData([...turnsData.slice(0, nextIndex), nextState])
+		const stateCurr: TurnState = state.turns[indexCurr]
+		const stateNext: TurnState = {...stateCurr, [key] : symbol}
 
 		// Checking for winners
-		const [winner, pattern] = FindWinner(nextState, nextIndex, symbol);
+		const [winner, pattern] = FindWinner(stateNext, indexNext, symbol);
 
-		nextState.pattern = pattern
-		nextState.winner = winner
+		stateNext.pattern = pattern
+		stateNext.winner = winner
+
+		// Updating turns array
+		const turnsCurr: TurnState[] = state.turns
+		const turnsNext: TurnState[] = [...turnsCurr.slice(0, indexNext), stateNext]
+
+		// Updating match state
+		setMatchState({
+			turns : turnsNext,
+			index : indexNext,
+			count : turnsNext.length
+		})
 	}
 
 
@@ -138,11 +158,12 @@ function App()
 
 	function HandleTurnSelect(index: number)
 	{
-		setTurnIndex(index)
+		setMatchState({...matchState, index})
 	}
 
 	// Properties
-	const turnState: TurnState = turnsData[turnIndex]
+	const turnIndex: number = matchState.index
+	const turnState: TurnState = matchState.turns[turnIndex]
 
 	// Rendering JSX component
 	return (
@@ -151,8 +172,7 @@ function App()
 
 				<View style={style.container0}>
 					<TurnsMenu
-						turnsData={turnsData}
-						turnIndex={turnIndex}
+						matchState={matchState}
 						onTurnSelect={HandleTurnSelect}
 					/>
 

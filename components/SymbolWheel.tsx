@@ -1,7 +1,7 @@
 import { GestureResponderEvent, NativeTouchEvent } from 'react-native'
 import { StyleSheet, View, Easing, Animated } from 'react-native'
 
-import{ useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { MutableRefObject } from 'react'
 import React from 'react'
 
@@ -90,6 +90,7 @@ function SymbolWheel({ turnIndex, onSpinerStart, onOffsetChanged }: Props)
 	},
 		[rotation]
 	)
+
 
 	useEffect(() => {
 		AnimateSectionRotate(turnIndex)

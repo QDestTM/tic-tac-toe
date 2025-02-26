@@ -4,34 +4,23 @@ import React from 'react'
 import { SquareState } from '../models/BaseTypes'
 import { TurnState } from '../models/TurnTypes'
 
-import { sq } from '../Shared'
+import { GridRange, sq } from '../Shared'
 import Square from './Square'
 
 
 
-interface Props
-{
+type Props = {
 	turnState : TurnState,
-
 	onSquarePress: (skey: string) => void
 }
 
 
 function GridBox({ onSquarePress, turnState }: Props)
 {
-	const range: number[] = [0, 1, 2]
-
 	// Functions
-	function GridGenerator(row: number)
+	function SquareRender(index: number)
 	{
-		return (
-			range.map((i) => SquareRender(row * range.length, i))
-		)
-	}
-
-	function SquareRender(row: number, index: number)
-	{
-		const skey: string = sq(row + index)
+		const skey: string = sq(index)
 
 		const state: SquareState = {
 			pattern : turnState.pattern,
@@ -51,7 +40,7 @@ function GridBox({ onSquarePress, turnState }: Props)
 	// Rendering JSX component
 	return (
 		<View style={styles.main}>
-			{ range.map(GridGenerator) }
+			{ GridRange.map(SquareRender) }
 		</View>
 	)
 }
