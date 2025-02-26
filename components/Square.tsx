@@ -112,7 +112,6 @@ function Square({ skey, state, onTouchInput }: Props)
 
 	// Rendering calculations
 	const ignoreTouch = state.symbol !== D || state.winner !== N
-	console.log(state.winner)
 	const boxStyle = {...style.box, backgroundColor,
 		borderRadius : `${borderRadius}%`
 	}
