@@ -1,7 +1,6 @@
-import { Animated, LayoutChangeEvent, LayoutRectangle, StyleSheet, View } from "react-native";
-import React, { MutableRefObject } from "react";
-import { useRef, useState } from "react";
-
+import { Animated, StyleSheet, View } from "react-native";
+import { LayoutChangeEvent, LayoutRectangle } from "react-native";
+import React, { useState } from "react";
 
 type Props = {
 	appearValue?: number
