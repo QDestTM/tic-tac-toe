@@ -1,5 +1,6 @@
-import { Animated, StyleSheet, View } from "react-native";
-import React from "react";
+import { Animated, LayoutChangeEvent, LayoutRectangle, StyleSheet, View } from "react-native";
+import React, { MutableRefObject } from "react";
+import { useRef, useState } from "react";
 
 
 type Props = {
@@ -9,15 +10,31 @@ type Props = {
 
 function OSymbol({ appearValue = 1.0 }: Props)
 {
-	const scale: number = appearValue
+	// States
+	const [ borderWidth, setBorderWidth ] = useState(10)
+
+	// Handlers
+	function HandleLayout(event: LayoutChangeEvent)
+	{
+		const layout: LayoutRectangle = event.nativeEvent.layout
+		setBorderWidth(layout.width * 0.15)
+	}
 
 	// Styles
-	const mainStyle = {...style.main, transform : [{scale}] }
+	const mainStyle = {...style.main,
+		transform   : [{scale : appearValue}]
+	}
+	const bodyStyle = {...style.body,
+		borderWidth : borderWidth
+	}
 
 	// Rendering JSX component
 	return (
 		<Animated.View style={mainStyle}>
-			<View style={style.body}/>
+			<View
+				onLayout={HandleLayout}
+				style={bodyStyle}
+			/>
 		</Animated.View>
 	)
 }
@@ -39,7 +56,7 @@ const style = StyleSheet.create({
 		position : 'absolute',
 		backgroundColor : 'transparent',
 
-		borderWidth: 10,
+		// borderWidth: 10,
 		borderRadius: '100%'
 	}
 })
