@@ -25,22 +25,22 @@ function OSymbol({ appearValue = 1.0 }: Props)
 
 const style = StyleSheet.create({
 	main : {
+		width : '100%',
+		height: '100%',
+
 		alignItems : 'center',
 		justifyContent : 'center',
-
-		width : '100%',
-		height: '100%'
 	},
 
 	body : {
+		width : '100%',
+		aspectRatio : 1,
+
 		position : 'absolute',
 		backgroundColor : 'transparent',
 
 		borderWidth: 10,
-		borderRadius: '100%',
-
-		width : '100%',
-		height : '100%'
+		borderRadius: '100%'
 	}
 })
 
