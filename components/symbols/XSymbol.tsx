@@ -1,6 +1,5 @@
-import { StyleSheet, View } from 'react-native'
-import React from 'react'
-
+import { Animated, StyleSheet, View } from "react-native";
+import React from "react";
 
 type Props = {
 	appearValue?: number
@@ -9,11 +8,11 @@ type Props = {
 
 function XSymbol({ appearValue = 1.0 }: Props)
 {
-	const scaleX: number = appearValue
 	const rotate: number = 45 * appearValue
 
 	// Styles
-	const mainStyle = {...style.main, transform : [{scaleX}] }
+	const mainStyle = {...style.main,
+		transform : [{ scaleY : appearValue }] }
 
 	const box0 = { transform : [{ rotateZ : `+${rotate}deg` }] }
 	const box1 = { transform : [{ rotateZ : `-${rotate}deg` }] }
@@ -21,8 +20,8 @@ function XSymbol({ appearValue = 1.0 }: Props)
 	// Rendering JSX component
 	return (
 		<View style={mainStyle}>
-			<View style={[style.box, box0]}/>
-			<View style={[style.box, box1]}/>
+			<Animated.View style={[style.box, box0]}/>
+			<Animated.View style={[style.box, box1]}/>
 		</View>
 	)
 }
@@ -38,11 +37,11 @@ const style = StyleSheet.create({
 	},
 
 	box : {
-		position : 'absolute',
-		backgroundColor : 'black',
+		width : '15%',
+		height : '100%',
 
-		width : '100%',
-		height : '15%'
+		position : 'absolute',
+		backgroundColor : 'black'
 	}
 })
 
