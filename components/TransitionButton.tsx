@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react"
 import { MutableRefObject } from "react"
 import { ReactNode } from "react"
 
-
 type Props = {
 	children?: ReactNode,
 
@@ -22,7 +21,7 @@ function TransitionButton({
 	touchEasing, onTouchAnimation, onTouchInput }: Props)
 {
 	const touchValueRef: MutableRefObject<Animated.Value> = useRef(null)
-
+	
 	// Initializing refs
 	if ( touchValueRef.current === null ) {
 		touchValueRef.current = new Animated.Value(0)
@@ -76,10 +75,14 @@ function TransitionButton({
 		setTouched(true)
 	}
 
-
 	function HandleTouchEnd()
 	{
 		setTouched(false); onTouchInput()
+	}
+
+	function HandleTouchCancel()
+	{
+		setTouched(false)
 	}
 
 	// Rendering JSX component
@@ -88,6 +91,7 @@ function TransitionButton({
 			style={style.main}
 			onTouchStart={!ignoreTouch && HandleTouchStart}
 			onTouchEnd={!ignoreTouch && HandleTouchEnd}
+			onTouchCancel={!ignoreTouch && HandleTouchCancel}
 		>
 			{children}
 		</View>
