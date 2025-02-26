@@ -10,7 +10,6 @@ import ColorInterpolate from 'color-interpolate'
 import { COLOR_SECONDARY_0, lerp } from "../Shared"
 import { COLOR_SECONDARY_1 } from "../Shared"
 import { COLOR_SECONDARY_2 } from "../Shared"
-import { COLOR_SECONDARY_3 } from "../Shared"
 import { D, N, O, X } from "../Shared"
 
 const BCG_COLORMAP = ColorInterpolate([COLOR_SECONDARY_0, COLOR_SECONDARY_1])
@@ -226,6 +225,7 @@ function TurnStateDisplay({
 		const color: string = BCG_COLORMAP(value)
 		setBackgroundColor(color)
 	}
+
 
 	function HandleTouchInput()
 	{
