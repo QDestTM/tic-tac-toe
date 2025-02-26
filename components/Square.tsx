@@ -133,6 +133,7 @@ function Square({ skey, state, onTouchInput }: Props)
 				<Animated.View style={boxStyle}>
 					<SymbolDisplay
 						key={`sdisp-${skey}`}
+						hiddenSymbols={[D]}
 						symbol={state.symbol}
 					/>
 				</Animated.View>
