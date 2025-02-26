@@ -20,9 +20,7 @@ const BORDER_RADIUS_P = 35 // P - Pressed state
 const BCG_COLORMAP = ColorInterpolate([COLOR_SECONDARY_0, COLOR_SECONDARY_1])
 const WIN_COLORMAP = ColorInterpolate([COLOR_SECONDARY_0, COLOR_SECONDARY_3])
 
-
-interface Props
-{
+type Props = {
 	skey: string,
 	state : SquareState
 
