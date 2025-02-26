@@ -311,11 +311,13 @@ const style = StyleSheet.create({
 	},
 
 	container1 : {
-		flex : 2
+		flex : 3
 	},
 
 	container2 : {
-		flex : 1
+		flex : 2,
+
+		padding : '10%'
 	}
 })
 
