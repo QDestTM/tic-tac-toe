@@ -9,11 +9,13 @@ import { MutableRefObject, useEffect, useRef } from "react"
 
 type Props = {
 	turnsData: TurnsData,
+	turnIndex: number,
+
 	onTurnSelect: (index: number) => void
 }
 
 
-function TurnsMenu({ turnsData, onTurnSelect }: Props)
+function TurnsMenu({ turnsData, turnIndex, onTurnSelect }: Props)
 {
 	const scrollViewRef: MutableRefObject<ScrollView> = useRef(null)
 
@@ -33,6 +35,7 @@ function TurnsMenu({ turnsData, onTurnSelect }: Props)
 			<View>
 				<TurnStateDisplay key={`state-disp-${index}`}
 					turnState={state} turnIndex={index}
+					selected={index === turnIndex}
 					onTurnSelect={onTurnSelect}
 				/>
 			</View>

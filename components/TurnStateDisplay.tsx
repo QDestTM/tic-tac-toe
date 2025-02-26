@@ -2,13 +2,28 @@ import { StyleSheet, View, Text, Animated, Easing } from "react-native"
 import { MutableRefObject, useEffect, useRef, useState } from "react"
 
 import { TurnState } from "../models/TurnTypes"
+import SymbolDisplay from "./SymbolDisplay"
+
+import TransitionButton from "./TransitionButton"
+import ColorInterpolate from 'color-interpolate'
+
+import { COLOR_SECONDARY_0, lerp } from "../Shared"
+import { COLOR_SECONDARY_1 } from "../Shared"
+import { COLOR_SECONDARY_2 } from "../Shared"
+import { COLOR_SECONDARY_3 } from "../Shared"
 import { D, N, O, X } from "../Shared"
 
-const ASPECT_DEFAULT: number = 0.5
+const BCG_COLORMAP = ColorInterpolate([COLOR_SECONDARY_0, COLOR_SECONDARY_1])
+
+const BORDER_RADIUS_N = 20 // N - Normal state
+const BORDER_RADIUS_S = 40 // S - Select state
+const ASPECT_DEFAULT = 0.5 // When visible
+const TRANSLATE_S = 15 // When selected
 
 type Props = {
 	turnIndex: number,
-	turnState: TurnState | undefined,
+	turnState?: TurnState,
+	selected?: boolean,
 
 	onTurnSelect: (index: number) => void
 }
@@ -38,12 +53,17 @@ function GetStateText(state: TurnState, index: number)
 
 
 // Main components
-function TurnStateDisplay({ turnIndex, turnState, onTurnSelect }: Props)
+function TurnStateDisplay({
+	turnIndex, turnState, onTurnSelect, selected = false}: Props)
 {
+	const selectValueRef: MutableRefObject<Animated.Value> = useRef(null)
 	const displayValueRef: MutableRefObject<Animated.Value> = useRef(null)
 	const aspectValueRef: MutableRefObject<Animated.Value> = useRef(null)
 
 	// Initializing refs
+	if ( selectValueRef.current === null ) {
+		selectValueRef.current = new Animated.Value(0)
+	}
 	if ( displayValueRef.current === null ) {
 		displayValueRef.current = new Animated.Value(0)
 	}
@@ -52,6 +72,10 @@ function TurnStateDisplay({ turnIndex, turnState, onTurnSelect }: Props)
 	}
 
 	// States
+	const [ backgroundColor, setBackgroundColor ] = useState(COLOR_SECONDARY_0)
+	const [ borderRadius, setBorderRadius ] = useState(BORDER_RADIUS_N)
+	const [ translate, setTranslate ] = useState(0)
+
 	const [ aspectRatio, setAspectRatio ] = useState(0)
 	const [ stateText, setStateText ] = useState('')
 
@@ -59,8 +83,19 @@ function TurnStateDisplay({ turnIndex, turnState, onTurnSelect }: Props)
 
 	// Hooks
 	useEffect(() => {
+		const selectValue: Animated.Value = selectValueRef.current
 		const displayValue: Animated.Value = displayValueRef.current
 		const aspectValue: Animated.Value = aspectValueRef.current
+
+		const selectListener = selectValue.addListener(({value}) => {
+			// Updating border radius state
+			const radius: number = lerp(BORDER_RADIUS_N, BORDER_RADIUS_S, value)
+			setBorderRadius(radius)
+
+			// Updating translate value state
+			const translate: number = TRANSLATE_S * value
+			setTranslate(translate)
+		})
 
 		const displayListener = displayValue.addListener(({value}) => {
 			setDisplay(value)
@@ -72,6 +107,7 @@ function TurnStateDisplay({ turnIndex, turnState, onTurnSelect }: Props)
 
 		// Returning dismount callback
 		return () => {
+			selectValue.removeListener(selectListener)
 			displayValue.removeListener(displayListener)
 			aspectValue.removeListener(aspectListener)
 		}
@@ -143,34 +179,95 @@ function TurnStateDisplay({ turnIndex, turnState, onTurnSelect }: Props)
 		[turnState]
 	)
 
+
+	useEffect(() => {
+		var animation: Animated.CompositeAnimation
+
+		if ( selected ) // Animate IN
+		{
+			animation = Animated.timing(
+				selectValueRef.current,
+				{
+					toValue : 1,
+					duration : 500,
+					easing : Easing.out(Easing.quad),
+					useNativeDriver : false
+				}
+			)
+		}
+		else // Animate OUT
+		{
+			animation = Animated.timing(
+				selectValueRef.current,
+				{
+					toValue : 0,
+					duration : 1000,
+					easing : Easing.out(Easing.quad),
+					useNativeDriver : false
+				}
+			)
+		}
+
+		animation.start()
+	},
+		[selected]
+	)
+
+	// Functions
+	function GetSymbolDisplay()
+	{
+		return <SymbolDisplay symbol={turnState?.winner}/>
+	}
+
 	// Handlers
-	function HandleTouchEnd()
+	function HandleTouchAnimation(value: number)
+	{
+		// Updating background color state
+		const color: string = BCG_COLORMAP(value)
+		setBackgroundColor(color)
+	}
+
+	function HandleTouchInput()
 	{
 		onTurnSelect(turnIndex)
 	}
 
 	// Styles
 	const mainStyle = StyleSheet.compose(style.main,
-		{ aspectRatio, paddingHorizontal : `${display * 3}%` })
+		{ aspectRatio,
+			paddingHorizontal : `${display * 3}%`,
+			top               : translate
+		}
+	)
 
-	const contentStyle = {...style.content, opacity : display }
+	const contentStyle = {
+		...style.content,
+		opacity         : display,
+		backgroundColor : backgroundColor,
+		borderRadius    : borderRadius
+	}
 
 	// Rendering JSX component
 	return (
 		<Animated.View style={mainStyle}>
-			<Animated.View
-				style={contentStyle}
-				onTouchEnd={HandleTouchEnd}
-			>
-				<View style={style.container0}>
-					<Text>{stateText}</Text>
-				</View>
-				<View style={style.container1}>
+			<Animated.View style={contentStyle}>
+				<TransitionButton
+					touchDuration={1000}
+					touchEasing={Easing.out(Easing.quad)}
+	
+					onTouchAnimation={HandleTouchAnimation}
+					onTouchInput={HandleTouchInput}
+				>
+					<View style={style.container0}>
+						<Text>{stateText}</Text>
+					</View>
+					<View style={style.container1}>
 
-				</View>
-				<View style={style.container2}>
-
-				</View>
+					</View>
+					<View style={style.container2}>
+						{GetSymbolDisplay()}
+					</View>
+				</TransitionButton>
 			</Animated.View>
 		</Animated.View>
 	)
@@ -187,13 +284,13 @@ const style = StyleSheet.create({
 
 		borderRadius : 20,
 		borderWidth : 5,
-		borderColor : 'burlywood',
+		borderColor : COLOR_SECONDARY_2,
 
 		flexDirection : 'column',
 		alignItems : 'stretch',
 		justifyContent : 'center',
 
-		backgroundColor : 'linen'
+		backgroundColor : COLOR_SECONDARY_0
 	},
 
 	// Containers
@@ -209,7 +306,10 @@ const style = StyleSheet.create({
 	},
 
 	container2 : {
-		flex : 2
+		flex : 2,
+
+		alignItems : 'center',
+		justifyContent : 'center'
 	}
 })
 

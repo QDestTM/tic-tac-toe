@@ -152,6 +152,7 @@ function App()
 				<View style={style.container0}>
 					<TurnsMenu
 						turnsData={turnsData}
+						turnIndex={turnIndex}
 						onTurnSelect={HandleTurnSelect}
 					/>
 
