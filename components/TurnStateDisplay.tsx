@@ -11,6 +11,7 @@ import { COLOR_SECONDARY_0, lerp } from "../Shared"
 import { COLOR_SECONDARY_1 } from "../Shared"
 import { COLOR_SECONDARY_2 } from "../Shared"
 import { D, N, O, X } from "../Shared"
+import StateGridBox from "./StateGridBox"
 
 const BCG_COLORMAP = ColorInterpolate([COLOR_SECONDARY_0, COLOR_SECONDARY_1])
 
@@ -218,6 +219,12 @@ function TurnStateDisplay({
 		return <SymbolDisplay symbol={turnState?.winner}/>
 	}
 
+
+	function GetStateGridBox()
+	{
+		return turnState ? <StateGridBox turnState={turnState}/> : undefined
+	}
+
 	// Handlers
 	function HandleTouchAnimation(value: number)
 	{
@@ -258,13 +265,13 @@ function TurnStateDisplay({
 					onTouchAnimation={HandleTouchAnimation}
 					onTouchInput={HandleTouchInput}
 				>
-					<View style={style.container0}>
+					<View style={[style.container, style.container0]}>
 						<Text>{stateText}</Text>
 					</View>
-					<View style={style.container1}>
-
+					<View style={[style.container, style.container1]}>
+						{GetStateGridBox()}
 					</View>
-					<View style={style.container2}>
+					<View style={[style.container, style.container2]}>
 						{GetSymbolDisplay()}
 					</View>
 				</TransitionButton>
@@ -294,11 +301,13 @@ const style = StyleSheet.create({
 	},
 
 	// Containers
-	container0 : {
-		flex : 1,
-
+	container : {
 		alignItems : 'center',
 		justifyContent : 'center'
+	},
+
+	container0 : {
+		flex : 1
 	},
 
 	container1 : {
@@ -306,10 +315,7 @@ const style = StyleSheet.create({
 	},
 
 	container2 : {
-		flex : 2,
-
-		alignItems : 'center',
-		justifyContent : 'center'
+		flex : 1
 	}
 })
 
