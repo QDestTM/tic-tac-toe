@@ -1,11 +1,18 @@
 import { GestureResponderEvent, NativeTouchEvent } from 'react-native'
 import { StyleSheet, View, Easing, Animated } from 'react-native'
 
-import React, { useState, useRef, useEffect } from 'react'
+import{ useState, useRef, useEffect } from 'react'
 import { MutableRefObject } from 'react'
+import React from 'react'
 
-import XSymbol from './XSymbol'
-import OSymbol from './OSymbol'
+import { COLOR_SECONDARY_0 } from '../Shared'
+import { COLOR_SECONDARY_2 } from '../Shared'
+import { COLOR_PRIMARY_0 } from '../Shared'
+import { COLOR_PRIMARY_1 } from '../Shared'
+import { COLOR_APP } from '../Shared'
+
+import XSymbol from './symbols/XSymbol'
+import OSymbol from './symbols/OSymbol'
 
 const ANGLE_STEP: number = 90
 const DX_TRACEHOLD: number = 6
@@ -18,7 +25,6 @@ type Props = {
 	onSpinerStart: () => void,
 	onOffsetChanged: (offset: number) => void
 }
-
 
 type Members = {
 	offset : number,
@@ -276,9 +282,9 @@ const style = StyleSheet.create({
 		alignItems : 'center',
 
 		borderWidth : 10,
-		borderColor : 'lightseagreen',
+		borderColor : COLOR_PRIMARY_1,
 
-		backgroundColor : 'teal'
+		backgroundColor : COLOR_PRIMARY_0
 	},
 
 	circle : {
@@ -287,9 +293,9 @@ const style = StyleSheet.create({
 
 		borderRadius : '100%',
 		borderWidth : 10,
-		borderColor : 'lightseagreen',
+		borderColor : COLOR_PRIMARY_1,
 
-		backgroundColor : 'powderblue'
+		backgroundColor : COLOR_APP
 	},
 
 	// Flex containers for displays
@@ -320,8 +326,8 @@ const style = StyleSheet.create({
 		borderWidth : 5,
 		borderRadius : '100%',
 
-		borderColor : 'burlywood',
-		backgroundColor : 'linen'
+		borderColor : COLOR_SECONDARY_2,
+		backgroundColor : COLOR_SECONDARY_0
 	},
 
 	displayBeg : {
