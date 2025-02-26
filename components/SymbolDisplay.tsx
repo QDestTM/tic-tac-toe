@@ -46,36 +46,37 @@ function SymbolDisplay({ symbol = N, hiddenSymbols = [] }: Props)
 
 
 	useEffect(() => {
-		var animation: Animated.CompositeAnimation
+		const animation = Animated.timing( // Hide animation
+			appearValueRef.current,
+			{
+				toValue : 0,
+				duration : appear == 0 ? 0 : 1000,
+				easing : Easing.out(Easing.quad),
+				useNativeDriver : false
+			}
+		)
 
-		if ( hiddenSymbols.includes(symbol) ) // Hide animation
+		// Starting animation and handling finish
+		animation.start(({ finished }) =>
 		{
-			animation = Animated.timing(
-				appearValueRef.current,
-				{
-					toValue : 0,
-					duration : 1000,
-					easing : Easing.out(Easing.quad),
-					useNativeDriver : false
-				}
-			)
-		}
-		else // Show animation
-		{
-			animation = Animated.timing(
-				appearValueRef.current,
-				{
-					toValue : 1,
-					easing : Easing.bounce,
-					duration : 1000,
-					useNativeDriver : false
-				}
-			)
+			const includes: boolean = hiddenSymbols.includes(symbol)
 
-			setDisplaySymbol(symbol)
-		}
+			if ( finished && !includes ) // Show animation
+			{
+				const animation = Animated.timing(
+					appearValueRef.current,
+					{
+						toValue : 1,
+						easing : Easing.bounce,
+						duration : 1000,
+						useNativeDriver : false
+					}
+				)
 
-		animation.start()
+				setDisplaySymbol(symbol)
+				animation.start()
+			}
+		})
 	},
 		[symbol]
 	)
