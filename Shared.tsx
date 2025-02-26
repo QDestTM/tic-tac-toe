@@ -30,6 +30,8 @@ export const MaxTurn: number = 8
 
 export const StateRange: number[]
 	= Array.from({ length : MaxTurn + 2 }, (_, i) => i)
+export const GridRange: number[]
+	= Array.from({ length : MaxTurn + 1 }, (_, i) => i)
 
 // Color constants
 export const COLOR_APP: string = 'powderblue'
