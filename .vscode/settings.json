@@ -67,6 +67,43 @@
 		{
 			"folderPath": "tic-tac-toe\\styles\\",
 			"color": "foldercolorizer.color_cc9966"
+		},
+		{
+			"folderPath": "tic-tac-toe\\metro.config.js\\",
+			"color": "foldercolorizer.color_669999"
+		},
+		{
+			"folderPath": "tic-tac-toe\\jest.config.js\\",
+			"color": "foldercolorizer.color_669999"
+		},
+		{
+			"folderPath": "tic-tac-toe\\babel.config.js\\",
+			"color": "foldercolorizer.color_669999"
+		},
+		{
+			"folderPath": "tic-tac-toe\\Gemfile\\",
+			"color": "foldercolorizer.color_669999"
+		},
+		{
+			"folderPath": "tic-tac-toe\\.watchmanconfig\\",
+			"color": "foldercolorizer.color_669999"
+		},
+		{
+			"folderPath": "tic-tac-toe\\.prettierrc.js\\",
+			"color": "foldercolorizer.color_669999"
+		},
+		{
+			"folderPath": "tic-tac-toe\\.eslintrc.js\\",
+			"color": "foldercolorizer.color_669999"
+		},
+		{
+			"folderPath": "tic-tac-toe\\keypass.txt\\",
+			"color": "foldercolorizer.color_9966cc",
+			"badge": "🛑"
+		},
+		{
+			"folderPath": "tic-tac-toe\\android\\",
+			"color": "foldercolorizer.color_33cc99"
 		}
 	]
 }
