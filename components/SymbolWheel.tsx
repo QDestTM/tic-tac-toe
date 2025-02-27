@@ -99,7 +99,7 @@ function SymbolWheel({ turnIndex, onSpinerStart, onOffsetChanged }: Props)
 	)
 
 	// Functions
-	function ClampRotation(rotation: number)
+	function NormalizeRotation(rotation: number)
 	{
 		return ((rotation % 360) + 360) % 360
 	}
@@ -184,7 +184,7 @@ function SymbolWheel({ turnIndex, onSpinerStart, onOffsetChanged }: Props)
 
 		// Applying rotation
 		let dx: number = (move.pageX - lastX) / 2
-		let rt: number = ClampRotation(rotation + dx)
+		let rt: number = NormalizeRotation(rotation + dx)
 
 		members.lastX = move.pageX
 		members.deltaX = dx
@@ -223,7 +223,7 @@ function SymbolWheel({ turnIndex, onSpinerStart, onOffsetChanged }: Props)
 	function HandleRotationFinish({ finished }: Animated.EndResult)
 	{
 		const members: Members = membersRef.current
-		members.rotation = ClampRotation(members.rotation)
+		members.rotation = NormalizeRotation(members.rotation)
 
 		setRotation(-rotation) // Updating rotation state
 
