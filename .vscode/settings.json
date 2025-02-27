@@ -104,6 +104,10 @@
 		{
 			"folderPath": "tic-tac-toe\\android\\",
 			"color": "foldercolorizer.color_33cc99"
+		},
+		{
+			"folderPath": "tic-tac-toe\\ios\\",
+			"color": "foldercolorizer.color_ccccff"
 		}
 	]
 }
