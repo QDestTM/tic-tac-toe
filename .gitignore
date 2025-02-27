@@ -11,6 +11,7 @@ expo-env.d.ts
 
 # Android
 android/
+ios/
 
 # Native
 *.orig.*
