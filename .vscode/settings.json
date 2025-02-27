@@ -108,6 +108,14 @@
 		{
 			"folderPath": "tic-tac-toe\\ios\\",
 			"color": "foldercolorizer.color_ccccff"
+		},
+		{
+			"folderPath": "tic-tac-toe\\.bundle\\",
+			"color": "foldercolorizer.color_666699"
+		},
+		{
+			"folderPath": "tic-tac-toe\\__tests__\\",
+			"color": "foldercolorizer.color_666699"
 		}
 	]
 }
