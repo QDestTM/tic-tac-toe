@@ -30,8 +30,10 @@ function TurnsMenu({ matchState, onTurnSelect }: Props)
 		const state: TurnState | undefined = matchState.turns[index]
 
 		return (
-			<View>
-				<TurnStateDisplay key={`state-disp-${index}`}
+			<View
+				key={`state-dv-${index}`}
+			>
+				<TurnStateDisplay key={`state-d-${index}`}
 					turnState={state} turnIndex={index}
 					selected={index === matchState.index}
 					onTurnSelect={onTurnSelect}
@@ -42,8 +44,12 @@ function TurnsMenu({ matchState, onTurnSelect }: Props)
 
 	// Rendering JSX component
 	return (
-		<View style={style.main}>
+		<View
+			key={'tmenu-view'}
+			style={style.main}
+		>
 			<ScrollView
+				key={'tmenu-sview'}
 				ref={scrollViewRef}
 				horizontal={true}
 				contentContainerStyle={style.scrollContainer}
