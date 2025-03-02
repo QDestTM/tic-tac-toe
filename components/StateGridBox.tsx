@@ -24,7 +24,10 @@ function StateGridBox({ turnState }: Props)
 		const skey: string = sq(index)
 
 		return (
-			<View style={styles.container}>
+			<View
+				key={`sb-sdv-${index}`}
+				style={styles.container}
+			>
 				<SymbolDisplay
 					hiddenSymbols={[D]}
 					symbol={turnState[skey]}
