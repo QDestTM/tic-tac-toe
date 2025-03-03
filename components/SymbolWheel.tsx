@@ -28,7 +28,7 @@ type Props = {
 
 type Members = {
 	rotation : number,
-	offset   : number,
+
 	deltaX   : number,
 	lastX    : number
 }
@@ -39,6 +39,7 @@ function SymbolWheel({ onSpinerStart, onOffsetChanged }: Props)
 {
 	const rotationValueRef: MutableRefObject<Animated.Value> = useRef(null)
 	const deltaxValueRef: MutableRefObject<Animated.Value> = useRef(null)
+
 	const membersRef: MutableRefObject<Members> = useRef(null)
 
 	// Initializing refs
@@ -49,7 +50,7 @@ function SymbolWheel({ onSpinerStart, onOffsetChanged }: Props)
 		deltaxValueRef.current = new Animated.Value(0)
 	}
 	if ( membersRef.current === null ) {
-		membersRef.current = {rotation : 0, offset : 0, deltaX : 0, lastX : 0}
+		membersRef.current = {rotation : 0, deltaX : 0, lastX : 0}
 	}
 
 	// Context
@@ -98,7 +99,7 @@ function SymbolWheel({ onSpinerStart, onOffsetChanged }: Props)
 
 	function AnimateSectionRotate(index: number)
 	{
-		const offset: number = membersRef.current.offset
+		const offset: number = matchState.offsetValue
 		rotationValueRef.current.stopAnimation()
 
 		// Calculating target rotation
@@ -141,11 +142,9 @@ function SymbolWheel({ onSpinerStart, onOffsetChanged }: Props)
 
 			// Calculating selected sector number
 			const sector: number = (toValue / ANGLE_STEP) % SECTOR_COUNT
-			const offset: number = sector % 2
 
 			// Invoking offset change event
-			membersRef.current.offset = offset
-			onOffsetChanged(offset)
+			onOffsetChanged(sector % 2)
 		})
 	}
 
