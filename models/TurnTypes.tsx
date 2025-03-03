@@ -9,5 +9,8 @@ export type TurnState = {
 export type MatchState = {
 	turns : TurnState[] // Array with all turns
 	index : number, // Index of current turn
-	count : number // Count of turns
+	count : number, // Count of turns
+
+	offsetValue : number, // Offset selected on start turn
+	offsetStore : number // Offset stored on turn change
 }
