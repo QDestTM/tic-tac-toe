@@ -119,4 +119,6 @@ const style = StyleSheet.create({
 })
 
 
-export default SymbolDisplay;
+export default React.memo(SymbolDisplay, (prev, next) => {
+	return prev.symbol === next.symbol
+});
