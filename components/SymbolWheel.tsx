@@ -34,6 +34,13 @@ type Members = {
 }
 
 
+// Functions
+function FixRotation(rotation: number)
+{
+	return ((rotation % 360) + 360) % 360
+}
+
+
 // Main components
 function SymbolWheel({ onSpinerStart, onOffsetChanged }: Props)
 {
@@ -93,7 +100,7 @@ function SymbolWheel({ onSpinerStart, onOffsetChanged }: Props)
 	// Functions
 	function SetRotationFixed(rotation: number)
 	{
-		setRotation(((rotation % 360) + 360) % 360)
+		setRotation( FixRotation(rotation) )
 	}
 
 
@@ -103,7 +110,7 @@ function SymbolWheel({ onSpinerStart, onOffsetChanged }: Props)
 		rotationValueRef.current.stopAnimation()
 
 		// Calculating target rotation
-		var toValue: number = -(index + offset) * ANGLE_STEP
+		var toValue: number = -FixRotation((index + offset) * ANGLE_STEP)
 
 		const animation = Animated.timing(
 			rotationValueRef.current,
