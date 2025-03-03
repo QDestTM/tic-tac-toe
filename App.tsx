@@ -8,6 +8,7 @@ import { MatchState, TurnState } from './models/TurnTypes';
 
 import { WinningPatterns, MinTurn, MaxTurn } from './Shared'
 import { D, N, sym, sq } from './Shared'
+import { MatchContext } from './Context';
 import { COLOR_APP } from './Shared'
 
 import SymbolWheel from './components/SymbolWheel';
@@ -16,7 +17,7 @@ import GridBox from './components/GridBox';
 
 
 // Functions
-function GenerateState(): MatchState
+function CreateMatchState(): MatchState
 {
 	const state: MatchState = {
 		turns : [{
@@ -25,7 +26,10 @@ function GenerateState(): MatchState
 		}],
 
 		index : 0,
-		count : 0
+		count : 0,
+
+		offsetValue : 0,
+		offsetStore : -1
 	}
 
 	// Grid generation
@@ -40,7 +44,7 @@ function GenerateState(): MatchState
 }
 
 
-function FindWinner(
+function CheckWinner(
 	state: TurnState, turn: number, symbol: string): [string, string[]]
 {
 	const comparer = (key: string) => state[key] === symbol
@@ -73,24 +77,14 @@ function FindWinner(
 // Main components
 function App()
 {
-	const symbolOffsetRef: MutableRefObject<number> = useRef(null)
-
-	// Initializing refs
-	if ( symbolOffsetRef.current === null ) {
-		symbolOffsetRef.current = 0
-	}
-
 	// States
 	var [ blockingInput, setBlockingInput ] = useState(false)
-	var [ matchState, setMatchState ] = useState(GenerateState)
+	var [ matchState, setMatchState ] = useState(CreateMatchState)
 
 	// Functions
 	function GetInputBlocker()
 	{
-		if ( !blockingInput )
-		{
-			return undefined
-		}
+		if ( !blockingInput ) return null
 
 		return (
 			<View
@@ -100,7 +94,6 @@ function App()
 			/>
 		)
 	}
-
 
 	// Handlers
 	function HandleSquarePress(key: string)
@@ -112,14 +105,13 @@ function App()
 		const indexNext: number = state.index + 1
 
 		// Updating turn state
-		const offset: number = symbolOffsetRef.current
-		const symbol: string = sym(turnIndex + offset)
+		const symbol : string = sym(turnIndex + state.offsetValue)
 
 		const stateCurr: TurnState = state.turns[indexCurr]
 		const stateNext: TurnState = {...stateCurr, [key] : symbol}
 
 		// Checking for winners
-		const [winner, pattern] = FindWinner(stateNext, indexNext, symbol);
+		const [winner, pattern] = CheckWinner(stateNext, indexNext, symbol);
 
 		stateNext.pattern = pattern
 		stateNext.winner = winner
@@ -130,9 +122,12 @@ function App()
 
 		// Updating match state
 		setMatchState({
-			turns : turnsNext,
-			index : indexNext,
-			count : turnsNext.length
+			turns  : turnsNext,
+			index  : indexNext,
+			count  : turnsNext.length,
+
+			offsetValue : state.offsetValue,
+			offsetStore : state.offsetStore
 		})
 	}
 
@@ -145,7 +140,7 @@ function App()
 
 	function HandleOffsetChanged(offset: number)
 	{
-		symbolOffsetRef.current = offset
+		setMatchState({...matchState, offsetValue : offset})
 		setBlockingInput(false)
 	}
 
@@ -158,46 +153,62 @@ function App()
 
 	function HandleTurnSelect(index: number)
 	{
-		setMatchState({...matchState, index})
+		var offsetValue: number = matchState.offsetValue
+		var offsetStore: number = matchState.offsetStore
+
+		// Checking and updating offsets
+		if ( index === 0 ) {
+			offsetStore = offsetValue
+		} else
+		if ( offsetStore !== -1 ) { // && index !== 0
+			offsetValue = offsetStore; offsetStore = -1
+		}
+
+		// Updating match state
+		setMatchState({...matchState, index, offsetStore, offsetValue})
 	}
 
 	// Properties
-	const turnIndex: number = matchState.index
-	const turnState: TurnState = matchState.turns[turnIndex]
+	const turnIndex : number    = matchState.index
+	const turnState : TurnState = matchState.turns[turnIndex]
 
 	// Rendering JSX component
 	return (
 		<StrictMode>
-			<View style={style.main}>
+			<MatchContext.Provider value={matchState}>
+				<View style={style.main}>
 
-				<View style={style.container0}>
-					<TurnsMenu
-						matchState={matchState}
-						onTurnSelect={HandleTurnSelect}
-					/>
+					{/* Container for TurnsMenu component */}
+					<View style={style.container0}>
+						<TurnsMenu
+							onTurnSelect={HandleTurnSelect}
+						/>
 
-					{GetInputBlocker()}
+						{GetInputBlocker()}
+					</View>
+
+					{/* Container for GridBox component */}
+					<View style={style.container1}>
+						<GridBox
+							onSquarePress={HandleSquarePress}
+							turnState={turnState}
+						/>
+
+						{GetInputBlocker()}
+					</View>
+
+					{/* Container for SymbolWheel component */}
+					<View style={style.container2}>
+						<SymbolWheel
+							onOffsetChanged={HandleOffsetChanged}
+							onSpinerStart={HandleSpinerStart}
+						/>
+					</View>
+
+					{/* StatusBar component */}
+					<StatusBar style="auto"/>
 				</View>
-
-				<View style={style.container1}>
-					<GridBox
-						onSquarePress={HandleSquarePress}
-						turnState={turnState}
-					/>
-
-					{GetInputBlocker()}
-				</View>
-
-				<View style={style.container2}>
-					<SymbolWheel
-						onOffsetChanged={HandleOffsetChanged}
-						onSpinerStart={HandleSpinerStart}
-						turnIndex={turnIndex}
-					/>
-				</View>
-
-				<StatusBar style="auto"/>
-			</View>
+			</MatchContext.Provider>
 		</StrictMode>
 	);
 }
