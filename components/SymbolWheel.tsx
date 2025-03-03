@@ -1,9 +1,11 @@
 import { GestureResponderEvent, NativeTouchEvent } from 'react-native'
 import { StyleSheet, View, Easing, Animated } from 'react-native'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useContext } from 'react'
 import { MutableRefObject } from 'react'
-import React from 'react'
+
+import { MatchState } from '../models/TurnTypes'
+import { MatchContext } from '../Context'
 
 import { COLOR_SECONDARY_0 } from '../Shared'
 import { COLOR_SECONDARY_2 } from '../Shared'
@@ -20,47 +22,38 @@ const DX_TRACEHOLD: number = 6
 const SECTOR_COUNT: number = 360 / ANGLE_STEP
 
 type Props = {
-	turnIndex: number,
-
 	onSpinerStart: () => void,
 	onOffsetChanged: (offset: number) => void
 }
 
 type Members = {
-	offset : number,
 	rotation : number,
-
-	deltaX : number,
-	lastX : number
+	offset   : number,
+	deltaX   : number,
+	lastX    : number
 }
 
 
-function SymbolWheel({ turnIndex, onSpinerStart, onOffsetChanged }: Props)
+// Main components
+function SymbolWheel({ onSpinerStart, onOffsetChanged }: Props)
 {
 	const rotationValueRef: MutableRefObject<Animated.Value> = useRef(null)
-	const dxValueRef: MutableRefObject<Animated.Value> = useRef(null)
-
+	const deltaxValueRef: MutableRefObject<Animated.Value> = useRef(null)
 	const membersRef: MutableRefObject<Members> = useRef(null)
 
 	// Initializing refs
 	if ( rotationValueRef.current === null ) {
 		rotationValueRef.current = new Animated.Value(0)
 	}
-
-	if ( dxValueRef.current === null ) {
-		dxValueRef.current = new Animated.Value(0)
+	if ( deltaxValueRef.current === null ) {
+		deltaxValueRef.current = new Animated.Value(0)
+	}
+	if ( membersRef.current === null ) {
+		membersRef.current = {rotation : 0, offset : 0, deltaX : 0, lastX : 0}
 	}
 
-	if ( membersRef.current === null )
-	{
-		membersRef.current = {
-			rotation : 0,
-			offset : 0,
-
-			deltaX : 0,
-			lastX  : 0,
-		}
-	}
+	// Context
+	const matchState: MatchState = useContext(MatchContext)
 
 	// States
 	const [ rotation, setRotation ] = useState(0)
@@ -70,50 +63,46 @@ function SymbolWheel({ turnIndex, onSpinerStart, onOffsetChanged }: Props)
 
 	// Hooks
 	useEffect(() => {
-		const rtValue: Animated.Value = rotationValueRef.current
-		const dxValue: Animated.Value = dxValueRef.current
+		const rotationValue: Animated.Value = rotationValueRef.current
+		const deltaxValue: Animated.Value = deltaxValueRef.current
 
 		// Connecting listeners
-		const rtListener = rtValue.addListener(({value}) => {
-			setRotation(value)
+		const rotationListener = rotationValue.addListener(({value}) => {
+			SetRotationFixed(value)
 		})
 
-		const dxListener = dxValue.addListener(({value}) => {
-			setRotation(rotation + value)
+		const deltaxListener = deltaxValue.addListener(({value}) => {
+			SetRotationFixed(membersRef.current.rotation + value)
 		})
 
 		// Returning dismount callback
 		return () => {
-			rtValue.removeListener(rtListener)
-			dxValue.removeListener(dxListener)
+			rotationValue.removeListener(rotationListener)
+			deltaxValue.removeListener(deltaxListener)
 		}
-	},
-		[rotation]
-	)
+	})
 
 
 	useEffect(() => {
-		AnimateSectionRotate(turnIndex)
+		AnimateSectionRotate(matchState.index)
 	},
-		[turnIndex]
+		[matchState.index]
 	)
 
 	// Functions
-	function NormalizeRotation(rotation: number)
+	function SetRotationFixed(rotation: number)
 	{
-		return ((rotation % 360) + 360) % 360
+		setRotation(((rotation % 360) + 360) % 360)
 	}
 
 
-	function AnimateSectionRotate(id: number)
+	function AnimateSectionRotate(index: number)
 	{
+		const offset: number = membersRef.current.offset
 		rotationValueRef.current.stopAnimation()
 
-		const members: Members = membersRef.current
-		const offset: number = members.offset
-
 		// Calculating target rotation
-		var toValue: number = -(id + offset) * ANGLE_STEP
+		var toValue: number = -(index + offset) * ANGLE_STEP
 
 		const animation = Animated.timing(
 			rotationValueRef.current,
@@ -152,12 +141,10 @@ function SymbolWheel({ turnIndex, onSpinerStart, onOffsetChanged }: Props)
 
 			// Calculating selected sector number
 			const sector: number = (toValue / ANGLE_STEP) % SECTOR_COUNT
-			const members: Members = membersRef.current
-
-			// Calculating offset and setting symbol
 			const offset: number = sector % 2
 
-			members.offset = offset
+			// Invoking offset change event
+			membersRef.current.offset = offset
 			onOffsetChanged(offset)
 		})
 	}
@@ -165,12 +152,14 @@ function SymbolWheel({ turnIndex, onSpinerStart, onOffsetChanged }: Props)
 	// Handlers
 	function HandleTouchStart(event: GestureResponderEvent)
 	{
+		const move: NativeTouchEvent = event.nativeEvent
 		const members: Members = membersRef.current
 
+		// Stop all active animations
 		rotationValueRef.current.stopAnimation()
-		dxValueRef.current.stopAnimation()
+		deltaxValueRef.current.stopAnimation()
 
-		const move: NativeTouchEvent = event.nativeEvent
+		// Set lastX as touch x position
 		members.lastX = move.pageX
 	}
 
@@ -178,36 +167,33 @@ function SymbolWheel({ turnIndex, onSpinerStart, onOffsetChanged }: Props)
 	function HandleTouchMove(event: GestureResponderEvent)
 	{
 		const members: Members = membersRef.current
-
 		const move: NativeTouchEvent = event.nativeEvent
-		const lastX: number = members.lastX
 
 		// Applying rotation
-		let dx: number = (move.pageX - lastX) / 2
-		let rt: number = NormalizeRotation(rotation + dx)
+		const dx: number = (move.pageX - members.lastX) / 2
+		SetRotationFixed(rotation + dx)
 
+		// Updating members values
 		members.lastX = move.pageX
 		members.deltaX = dx
-
-		setRotation(rt)
 	}
 
 
 	function HandleTouchEnd(event: GestureResponderEvent)
 	{
-		onSpinerStart() // In any case leads to onSymbolSelect call
+		onSpinerStart() // In any case leads to onSpinerStart call
 		const dx: number = membersRef.current.deltaX
 
-		// Just snap rotation of dx too small
+		// Just snap rotation if dx too small
 		if ( Math.abs(dx) < DX_TRACEHOLD ) {
 			return AnimateSnapRotation()
 		}
 
-		// Animating wheel rotation
-		dxValueRef.current.setValue(dx)
+		// Animating wheel spiner rotation
+		deltaxValueRef.current.setValue(dx)
 
 		const animation = Animated.timing(
-			dxValueRef.current,
+			deltaxValueRef.current,
 			{
 				toValue : 0,
 				duration : 4000,
@@ -222,16 +208,12 @@ function SymbolWheel({ turnIndex, onSpinerStart, onOffsetChanged }: Props)
 
 	function HandleRotationFinish({ finished }: Animated.EndResult)
 	{
-		const members: Members = membersRef.current
-		members.rotation = NormalizeRotation(members.rotation)
-
-		setRotation(-rotation) // Updating rotation state
-
+		SetRotationFixed(rotation) // Updating rotation state
 		if ( finished ) AnimateSnapRotation()
 	}
 
 	// Rendering calculations
-	const canRotate: boolean = turnIndex === 0
+	const canRotate: boolean = matchState.index === 0
 
 	// Styles
 	const mainStyle = {...style.main,
@@ -248,21 +230,21 @@ function SymbolWheel({ turnIndex, onSpinerStart, onOffsetChanged }: Props)
 			<View style={style.circle}/> {/* Decorative circle in center */}
 
 			{/* Horizontal wheel container with a symbols display */}
-			<View key='wdispc-evn' style={[style.container, style.containerH]}>
-				<View key='wdisp-0' style={[style.display, style.displayBeg]}>
+			<View style={[style.container, style.containerH]}>
+				<View style={[style.display, style.displayBeg]}>
 					<XSymbol/>
 				</View>
-				<View key='wdisp-2' style={[style.display, style.displayEnd]}>
+				<View style={[style.display, style.displayEnd]}>
 					<XSymbol/>
 				</View>
 			</View>
 
 			{/* Vertical wheel container with a symbols display */}
-			<View key='wdispc-odd' style={[style.container, style.containerV]}>
-				<View key='wdisp-1' style={[style.display, style.displayBeg]}>
+			<View style={[style.container, style.containerV]}>
+				<View style={[style.display, style.displayBeg]}>
 					<OSymbol/>
 				</View>
-				<View key='wdisp-3' style={[style.display, style.displayEnd]}>
+				<View style={[style.display, style.displayEnd]}>
 					<OSymbol/>
 				</View>
 			</View>
