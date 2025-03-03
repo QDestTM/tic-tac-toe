@@ -1,17 +1,19 @@
 import { StyleSheet, View, Text, Animated, Easing } from "react-native"
-import { MutableRefObject, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useContext } from "react"
+import React, { MutableRefObject } from "react"
 
 import { TurnState } from "../models/TurnTypes"
 import SymbolDisplay from "./SymbolDisplay"
 
 import TransitionButton from "./TransitionButton"
 import ColorInterpolate from 'color-interpolate'
+import StateGridBox from "./StateGridBox"
 
-import { COLOR_SECONDARY_0, lerp } from "../Shared"
+import { COLOR_SECONDARY_0 } from "../Shared"
 import { COLOR_SECONDARY_1 } from "../Shared"
 import { COLOR_SECONDARY_2 } from "../Shared"
-import { D, N, O, X } from "../Shared"
-import StateGridBox from "./StateGridBox"
+import { D, N, O, X, lerp } from "../Shared"
+
 
 const BCG_COLORMAP = ColorInterpolate([COLOR_SECONDARY_0, COLOR_SECONDARY_1])
 
@@ -30,11 +32,10 @@ type Props = {
 
 
 // Functions
-function GetStateText(state: TurnState, index: number)
+function GetStateText(index: number, state?: TurnState)
 {
-	if ( index === 0 ) {
-		return "Start!"
-	}
+	if ( !state ) return ''
+	if ( !index ) return "Start!"
 
 	switch (state.winner)
 	{
@@ -174,7 +175,7 @@ function TurnStateDisplay({
 		Animated.parallel(animations, { stopTogether : false }).start()
 
 		// Updating state text
-		setStateText(turnState ? GetStateText(turnState, turnIndex) : '')
+		setStateText( GetStateText(turnIndex, turnState) )
 	},
 		[turnState]
 	)
