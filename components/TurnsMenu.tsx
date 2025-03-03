@@ -1,10 +1,10 @@
 import { ScrollView, StyleSheet, View } from "react-native"
+import { MutableRefObject, useEffect, useRef } from "react"
 
 import { MatchState, TurnState } from "../models/TurnTypes"
 import { StateRange } from "../Shared"
 
 import TurnStateDisplay from "./TurnStateDisplay"
-import { MutableRefObject, useEffect, useRef } from "react"
 
 
 type Props = {
