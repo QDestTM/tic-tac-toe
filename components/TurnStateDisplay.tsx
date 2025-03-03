@@ -1,5 +1,5 @@
 import { StyleSheet, View, Text, Animated, Easing } from "react-native"
-import { useEffect, useRef, useState, useContext } from "react"
+import { useEffect, useRef, useState } from "react"
 import React, { MutableRefObject } from "react"
 
 import { TurnState } from "../models/TurnTypes"
@@ -30,8 +30,22 @@ type Props = {
 	onTurnSelect: (index: number) => void
 }
 
+type SelectState = {
+	borderRad: number,
+	translate: number
+}
+
 
 // Functions
+function CreateSelectState(): SelectState
+{
+	return {
+		borderRad : 0,
+		translate : 0
+	}
+}
+
+
 function GetStateText(index: number, state?: TurnState)
 {
 	if ( !state ) return ''
@@ -57,45 +71,44 @@ function GetStateText(index: number, state?: TurnState)
 function TurnStateDisplay({
 	turnIndex, turnState, onTurnSelect, selected = false}: Props)
 {
-	const selectValueRef: MutableRefObject<Animated.Value> = useRef(null)
 	const displayValueRef: MutableRefObject<Animated.Value> = useRef(null)
+	const selectValueRef: MutableRefObject<Animated.Value> = useRef(null)
 	const aspectValueRef: MutableRefObject<Animated.Value> = useRef(null)
 
 	// Initializing refs
-	if ( selectValueRef.current === null ) {
-		selectValueRef.current = new Animated.Value(0)
-	}
 	if ( displayValueRef.current === null ) {
 		displayValueRef.current = new Animated.Value(0)
+	}
+	if ( selectValueRef.current === null ) {
+		selectValueRef.current = new Animated.Value(0)
 	}
 	if ( aspectValueRef.current === null ) {
 		aspectValueRef.current = new Animated.Value(0)
 	}
 
 	// States
-	const [ backgroundColor, setBackgroundColor ] = useState(COLOR_SECONDARY_0)
-	const [ borderRadius, setBorderRadius ] = useState(BORDER_RADIUS_N)
-	const [ translate, setTranslate ] = useState(0)
-
-	const [ aspectRatio, setAspectRatio ] = useState(0)
+	const [ selectState, setSelectState ] = useState(CreateSelectState)
+	const [ backColor, setBackColor ] = useState(COLOR_SECONDARY_0)
 	const [ stateText, setStateText ] = useState('')
 
+	const [ aspectRatio, setAspectRatio ] = useState(0)
 	const [ display, setDisplay ] = useState(0)
 
 	// Hooks
 	useEffect(() => {
-		const selectValue: Animated.Value = selectValueRef.current
 		const displayValue: Animated.Value = displayValueRef.current
+		const selectValue: Animated.Value = selectValueRef.current
 		const aspectValue: Animated.Value = aspectValueRef.current
 
 		const selectListener = selectValue.addListener(({value}) => {
-			// Updating border radius state
-			const radius: number = lerp(BORDER_RADIUS_N, BORDER_RADIUS_S, value)
-			setBorderRadius(radius)
+			// Calculating border radius state
+			const borderRad: number = lerp(BORDER_RADIUS_N, BORDER_RADIUS_S, value)
 
-			// Updating translate value state
+			// Calculating translate value state
 			const translate: number = TRANSLATE_S * value
-			setTranslate(translate)
+
+			// Updating select state
+			setSelectState({borderRad, translate})
 		})
 
 		const displayListener = displayValue.addListener(({value}) => {
@@ -108,8 +121,8 @@ function TurnStateDisplay({
 
 		// Returning dismount callback
 		return () => {
-			selectValue.removeListener(selectListener)
 			displayValue.removeListener(displayListener)
+			selectValue.removeListener(selectListener)
 			aspectValue.removeListener(aspectListener)
 		}
 	})
@@ -214,24 +227,10 @@ function TurnStateDisplay({
 		[selected]
 	)
 
-	// Functions
-	function GetSymbolDisplay()
-	{
-		return <SymbolDisplay symbol={turnState?.winner}/>
-	}
-
-
-	function GetStateGridBox()
-	{
-		return turnState ? <StateGridBox turnState={turnState}/> : undefined
-	}
-
 	// Handlers
 	function HandleTouchAnimation(value: number)
 	{
-		// Updating background color state
-		const color: string = BCG_COLORMAP(value)
-		setBackgroundColor(color)
+		setBackColor( BCG_COLORMAP(value) )
 	}
 
 
@@ -244,15 +243,15 @@ function TurnStateDisplay({
 	const mainStyle = StyleSheet.compose(style.main,
 		{ aspectRatio,
 			paddingHorizontal : `${display * 3}%`,
-			top               : translate
+			top               : selectState.translate
 		}
 	)
 
 	const contentStyle = {
 		...style.content,
 		opacity         : display,
-		backgroundColor : backgroundColor,
-		borderRadius    : borderRadius
+		borderRadius    : selectState.borderRad,
+		backgroundColor : backColor
 	}
 
 	// Rendering JSX component
@@ -262,7 +261,7 @@ function TurnStateDisplay({
 				<TransitionButton
 					touchDuration={1000}
 					touchEasing={Easing.out(Easing.quad)}
-	
+
 					onTouchAnimation={HandleTouchAnimation}
 					onTouchInput={HandleTouchInput}
 				>
@@ -270,10 +269,12 @@ function TurnStateDisplay({
 						<Text>{stateText}</Text>
 					</View>
 					<View style={[style.container, style.container1]}>
-						{GetStateGridBox()}
+						{
+							turnState ? <StateGridBox turnState={turnState}/> : null
+						}
 					</View>
 					<View style={[style.container, style.container2]}>
-						{GetSymbolDisplay()}
+						<SymbolDisplay symbol={turnState?.winner}/>
 					</View>
 				</TransitionButton>
 			</Animated.View>
