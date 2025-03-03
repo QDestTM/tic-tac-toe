@@ -1,21 +1,25 @@
 import { ScrollView, StyleSheet, View } from "react-native"
-import { MutableRefObject, useEffect, useRef } from "react"
+import { useEffect, useRef, useContext } from "react"
+import { MutableRefObject } from "react"
 
-import { MatchState, TurnState } from "../models/TurnTypes"
+import { MatchContext } from "../Context"
 import { StateRange } from "../Shared"
 
+import { MatchState, TurnState } from "../models/TurnTypes"
 import TurnStateDisplay from "./TurnStateDisplay"
 
 
 type Props = {
-	matchState: MatchState,
 	onTurnSelect: (index: number) => void
 }
 
 
-function TurnsMenu({ matchState, onTurnSelect }: Props)
+function TurnsMenu({ onTurnSelect }: Props)
 {
 	const scrollViewRef: MutableRefObject<ScrollView> = useRef(null)
+
+	// Context
+	const matchState: MatchState = useContext(MatchContext)
 
 	// Hooks
 	useEffect(() => {
