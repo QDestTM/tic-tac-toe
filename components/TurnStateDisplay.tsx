@@ -14,7 +14,6 @@ import { COLOR_SECONDARY_1 } from "../Shared"
 import { COLOR_SECONDARY_2 } from "../Shared"
 import { D, N, O, X, lerp } from "../Shared"
 
-
 const BCG_COLORMAP = ColorInterpolate([COLOR_SECONDARY_0, COLOR_SECONDARY_1])
 
 const BORDER_RADIUS_N = 20 // N - Normal state

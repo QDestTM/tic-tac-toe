@@ -213,6 +213,7 @@ function App()
 	);
 }
 
+
 const style = StyleSheet.create({
 	main : {
 		flex: 1,

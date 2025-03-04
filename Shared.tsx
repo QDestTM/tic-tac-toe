@@ -1,4 +1,3 @@
-
 // Square key formatter
 export function sq(index: number): string
 {
@@ -18,11 +17,13 @@ export function lerp(a: number, b: number, x: number): number
 	return a + (b - a) * x
 }
 
+
 // Symbols constants
 export const X: string = 'x'
 export const O: string = 'o'
 export const N: string = 'n'
 export const D: string = '-'
+
 
 // Turn indexes
 export const MinTurn: number = 4
@@ -32,6 +33,7 @@ export const StateRange: number[]
 	= Array.from({ length : MaxTurn + 2 }, (_, i) => i)
 export const GridRange: number[]
 	= Array.from({ length : MaxTurn + 1 }, (_, i) => i)
+
 
 // Color constants
 export const COLOR_APP: string = 'powderblue'
